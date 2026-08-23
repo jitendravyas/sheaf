@@ -1,3 +1,12 @@
 __pycache__/
-*.pyc
+*.py[cod]
+*.so
 notes.json
+/build/
+/builddir/
+/_build/
+.flatpak-builder/
+repo/
+*.swp
+*~
+.mesonpy

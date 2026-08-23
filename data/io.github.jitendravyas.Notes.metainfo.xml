@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.jitendravyas.Notes</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Notes</name>
+  <summary>Write and keep simple local notes</summary>
+  <developer id="io.github.jitendravyas">
+    <name>Jitendra Vyas</name>
+  </developer>
+  <description>
+    <p>
+      Notes is a small desktop app for writing things down and keeping them on
+      your computer. Pick a note in the sidebar, edit the title or body, and
+      changes save on their own.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Sidebar list with title and preview</li>
+      <li>Title and body editor</li>
+      <li>New note, and delete with confirmation</li>
+      <li>Automatic save to your user data directory</li>
+      <li>Keyboard shortcut: Ctrl+N for a new note</li>
+    </ul>
+  </description>
+  <url type="homepage">https://github.com/jitendravyas/omarchy-notes</url>
+  <url type="bugtracker">https://github.com/jitendravyas/omarchy-notes/issues</url>
+  <url type="vcs-browser">https://github.com/jitendravyas/omarchy-notes</url>
+  <launchable type="desktop-id">io.github.jitendravyas.Notes.desktop</launchable>
+  <provides>
+    <binary>notes</binary>
+  </provides>
+  <branding>
+    <color type="primary" scheme_preference="light">#f6e27a</color>
+    <color type="primary" scheme_preference="dark">#c9a227</color>
+  </branding>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  <recommends>
+    <display_length compare="ge">768</display_length>
+  </recommends>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-08-23">
+      <description>
+        <p>First packaged release as a GTK 4 and libadwaita desktop app.</p>
+      </description>
+    </release>
+  </releases>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/jitendravyas/omarchy-notes/main/screenshot.png</image>
+      <caption>Sidebar of notes and the title and body editor</caption>
+    </screenshot>
+  </screenshots>
+  <categories>
+    <category>Utility</category>
+    <category>Office</category>
+  </categories>
+  <keywords>
+    <keyword>notes</keyword>
+    <keyword>notepad</keyword>
+    <keyword>text</keyword>
+    <keyword>memo</keyword>
+  </keywords>
+</component>

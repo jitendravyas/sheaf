@@ -1,0 +1,11 @@
+#!@PYTHON@
+# SPDX-License-Identifier: MIT
+
+import sys
+
+sys.path.insert(1, '@pkgdatadir@')
+
+from main import main
+
+if __name__ == '__main__':
+    sys.exit(main() or 0)
