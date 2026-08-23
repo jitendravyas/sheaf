@@ -2,6 +2,8 @@
 
 A small native GTK3 notes app for Linux. Works on Omarchy (Arch + Hyprland) and any other GTK desktop.
 
+This app has not been tested on Linux yet.
+
 ![Notes app](screenshot.png)
 
 Notes live in a JSON file next to the app. The first launch seeds a few sample notes.
