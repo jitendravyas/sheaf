@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-"""Snippets — GTK 4 / libadwaita code snippet scratchpad."""
+"""Snippets — GTK 4 / libadwaita scratchpad for code, text, and Markdown."""
 
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ class SnippetsApplication(Adw.Application):
             website="https://github.com/jitendravyas/omarchy-notes",
             issue_url="https://github.com/jitendravyas/omarchy-notes/issues",
             license_type=Gtk.License.MIT_X11,
-            comments="A local code snippet scratchpad for the Linux desktop.",
+            comments="A local scratchpad for code snippets, plain text, and Markdown notes.",
             developers=["Jitendra Vyas"],
             copyright="© 2026 Jitendra Vyas",
         )

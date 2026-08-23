@@ -4,23 +4,26 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>Snippets</name>
-  <summary>Save and copy local code snippets</summary>
+  <summary>Save code snippets, plain text, and Markdown notes</summary>
   <developer id="io.github.jitendravyas">
     <name>Jitendra Vyas</name>
   </developer>
   <description>
     <p>
-      Snippets is a local code snippet scratchpad for Linux. Keep the commands
-      and fragments you reuse — pacman, git, ssh, python, rsync — search them
-      instantly, and copy the body to the clipboard in one action.
+      Snippets is a local scratchpad for Linux. Keep the commands and
+      fragments you reuse — pacman, git, ssh, python, rsync — write a plain
+      text reminder, or draft Markdown. Search instantly and copy the body
+      to the clipboard in one action.
     </p>
     <p>Features:</p>
     <ul>
-      <li>Sidebar list with title, language, and a one-line preview</li>
+      <li>Write each item as code, plain text, or Markdown</li>
+      <li>Sidebar list with title, format tag (bash / text / md), and a one-line preview</li>
       <li>Instant search across title, language, and body</li>
-      <li>Title, language tag, and monospace editor</li>
-      <li>Copy snippet (toolbar, Ctrl+Shift+C, or Ctrl+C when nothing is selected)</li>
-      <li>New snippet (Ctrl+N) and delete with confirmation</li>
+      <li>Code mode keeps a language tag and a monospace editor</li>
+      <li>Markdown preview for headings, lists, emphasis, code, and links</li>
+      <li>Copy the body (toolbar, Ctrl+Shift+C, or Ctrl+C when nothing is selected)</li>
+      <li>New note (Ctrl+N) and delete with confirmation</li>
       <li>Automatic save to your user data directory</li>
     </ul>
   </description>
@@ -47,14 +50,14 @@
   <releases>
     <release version="0.1.0" date="2026-08-23">
       <description>
-        <p>Code snippet scratchpad: search, language tags, and one-click copy.</p>
+        <p>Code, plain text, and Markdown notes with search and one-click copy.</p>
       </description>
     </release>
   </releases>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/jitendravyas/omarchy-notes/main/screenshot.png</image>
-      <caption>Sidebar of snippets and the title, language, and body editor</caption>
+      <caption>Markdown note with format control and rendered preview</caption>
     </screenshot>
   </screenshots>
   <categories>
@@ -64,6 +67,9 @@
   <keywords>
     <keyword>snippets</keyword>
     <keyword>code</keyword>
+    <keyword>text</keyword>
+    <keyword>markdown</keyword>
+    <keyword>notes</keyword>
     <keyword>scratchpad</keyword>
     <keyword>clipboard</keyword>
     <keyword>bash</keyword>

@@ -18,6 +18,7 @@ install_data(
   [
     'main.py',
     'window.py',
+    'markdown.py',
   ],
   install_dir: pkgdatadir,
 )

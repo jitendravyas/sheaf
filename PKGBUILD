@@ -4,7 +4,7 @@
 pkgname=omarchy-notes
 pkgver=0.1.0
 pkgrel=1
-pkgdesc="Local code snippet scratchpad for the Linux desktop"
+pkgdesc="Local scratchpad for code snippets, plain text, and Markdown notes"
 arch=('any')
 url="https://github.com/jitendravyas/omarchy-notes"
 license=('MIT')

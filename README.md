@@ -1,7 +1,8 @@
 # Snippets
 
-A local **code snippet scratchpad** for Linux. Keep the commands and fragments
-you actually reuse, find them instantly, and copy the body to the clipboard.
+A local scratchpad for **code snippets**, **plain text**, and **Markdown**
+notes. Keep the commands and fragments you reuse, write a short note, or
+draft Markdown — then find it instantly and copy the body to the clipboard.
 
 It uses GTK 4 and libadwaita. The window title is **Snippets**. The application
 id is still `io.github.jitendravyas.Notes` so existing desktop, D-Bus, and
@@ -17,8 +18,9 @@ desktops yet.
 
 Omarchy and Arch developers already live in a terminal. Snippets is for the
 stuff you should not have to remember: a pacman / `omarchy pkg` line, a git
-undo, an ssh `Host` block, a Python venv, an rsync exclude list. First launch
-seeds a few of those. After that it is your scratchpad.
+undo, an ssh `Host` block, a Python venv, an rsync exclude list — plus the
+plain-text reminders and Markdown meeting notes that sit next to them. First
+launch seeds a few of those. After that it is your scratchpad.
 
 ## Install on Omarchy
 
@@ -86,15 +88,17 @@ sudo pacman -S meson ninja
 python3 src/main.py
 ```
 
-Snippets are stored in your user data directory, not next to the source files:
+Notes are stored in your user data directory, not next to the source files:
 
 `$XDG_DATA_HOME/io.github.jitendravyas.Notes/snippets.json`
 
 If `XDG_DATA_HOME` is unset, that is
 `~/.local/share/io.github.jitendravyas.Notes/snippets.json`.
 
-Each item is `{id, title, language, body, updated}`. The first launch seeds a
-few useful snippets. After that, New, Delete, and edits are saved automatically.
+Each item is `{id, title, format, language, body, updated}`. `format` is
+`code`, `text`, or `markdown`. The first launch seeds useful code snippets
+plus a plain-text note and a Markdown note. After that, New, Delete, and
+edits are saved automatically. New items reuse the last format you chose.
 
 ## Build and install with Meson
 
@@ -133,11 +137,15 @@ flatpak run io.github.jitendravyas.Notes
 
 ## Features
 
-- Sidebar list of snippets with title, language, and a one-line preview
+- Write each item as **code**, **plain text**, or **Markdown**
+- Sidebar list with title, format tag (bash / text / md), and a one-line preview
 - Instant search (title, language, or body)
-- Title, language tag, and monospace body editor
-- Copy snippet (toolbar button, Ctrl+Shift+C, or Ctrl+C when you are not selecting text)
-- New snippet (toolbar or Ctrl+N)
+- Code mode: language tag and a monospace editor
+- Plain text mode: proportional font, language field hidden
+- Markdown mode: comfortable editor plus a Preview that renders headings,
+  lists, bold/italic, code, and links (a conservative subset, stdlib + GTK)
+- Copy the body (toolbar button, Ctrl+Shift+C, or Ctrl+C when you are not selecting text)
+- New item (toolbar or Ctrl+N) remembers the last format
 - Delete with confirmation
 - Autosave
 - Single-instance application (`io.github.jitendravyas.Notes`)

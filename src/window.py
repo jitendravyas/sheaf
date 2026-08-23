@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Main window for Snippets — a local code snippet scratchpad."""
+"""Main window for Snippets — code, plain text, and Markdown notes."""
 
 from __future__ import annotations
 
@@ -15,12 +15,21 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, Gdk, Gio, GLib, Graphene, Gtk, Pango  # noqa: E402
 
+from markdown import (  # noqa: E402
+    FORMATS,
+    inline_to_pango,
+    normalize_format,
+    parse_markdown,
+    sidebar_kind,
+)
+
 APP_ID = "io.github.jitendravyas.Notes"
 
 SAMPLE_SNIPPETS = [
     {
         "id": "seed-pacman",
         "title": "Install or update a package",
+        "format": "code",
         "language": "bash",
         "body": (
             "# Search the repos, then install\n"
@@ -42,6 +51,7 @@ SAMPLE_SNIPPETS = [
     {
         "id": "seed-git-undo",
         "title": "Undo the last git commit",
+        "format": "code",
         "language": "git",
         "body": (
             "# Keep all changes, still staged\n"
@@ -66,6 +76,7 @@ SAMPLE_SNIPPETS = [
     {
         "id": "seed-ssh",
         "title": "SSH config for a host",
+        "format": "code",
         "language": "ssh",
         "body": (
             "# ~/.ssh/config\n"
@@ -89,6 +100,7 @@ SAMPLE_SNIPPETS = [
     {
         "id": "seed-venv",
         "title": "Python virtualenv",
+        "format": "code",
         "language": "python",
         "body": (
             "python3 -m venv .venv\n"
@@ -107,6 +119,7 @@ SAMPLE_SNIPPETS = [
     {
         "id": "seed-rsync",
         "title": "rsync a project over SSH",
+        "format": "code",
         "language": "bash",
         "body": (
             "rsync -aP --delete \\\n"
@@ -122,6 +135,7 @@ SAMPLE_SNIPPETS = [
     {
         "id": "seed-fetch",
         "title": "Fetch JSON from an API",
+        "format": "code",
         "language": "javascript",
         "body": (
             "const res = await fetch(\"https://api.example.com/v1/items\", {\n"
@@ -140,6 +154,55 @@ SAMPLE_SNIPPETS = [
             "const data = await res.json();\n"
         ),
         "updated": "2026-08-22T16:20:00+00:00",
+    },
+    {
+        "id": "seed-desk-reminder",
+        "title": "Desk reminder",
+        "format": "text",
+        "language": "text",
+        "body": (
+            "Weekly review — keep this short.\n"
+            "\n"
+            "Inbox to zero, or at least to a list you trust.\n"
+            "Check the calendar for the next two weeks.\n"
+            "Pick three tasks that actually matter and drop the rest.\n"
+            "\n"
+            "Send the Omarchy notes update before Friday.\n"
+            "Do not start a new side project until the current one ships.\n"
+        ),
+        "updated": "2026-08-23T15:20:00+00:00",
+    },
+    {
+        "id": "seed-meeting-md",
+        "title": "Meeting notes template",
+        "format": "markdown",
+        "language": "markdown",
+        "body": (
+            "# Meeting notes\n"
+            "\n"
+            "A short **template** for standups and *reviews*.\n"
+            "\n"
+            "## Agenda\n"
+            "\n"
+            "- What shipped last week\n"
+            "- What is blocked\n"
+            "- Next steps\n"
+            "\n"
+            "## Commands\n"
+            "\n"
+            "Use `omarchy pkg add` when the AUR package exists.\n"
+            "\n"
+            "```bash\n"
+            "sudo pacman -Syu\n"
+            "```\n"
+            "\n"
+            "See the [Arch wiki](https://wiki.archlinux.org) for more.\n"
+            "\n"
+            "---\n"
+            "\n"
+            "> Keep it to one page. If it needs a spec, write a spec.\n"
+        ),
+        "updated": "2026-08-23T16:05:00+00:00",
     },
 ]
 
@@ -170,11 +233,19 @@ CSS = b"""
   opacity: 0.62;
 }
 
-textview.snippet-body,
-textview.snippet-body text {
+textview.snippet-body.kind-code,
+textview.snippet-body.kind-code text,
+textview.snippet-body.kind-markdown,
+textview.snippet-body.kind-markdown text {
   font-family: "Source Code Pro", "JetBrains Mono", "Fira Code",
     "Noto Sans Mono", "DejaVu Sans Mono", monospace;
   font-size: 13px;
+}
+
+textview.snippet-body.kind-text,
+textview.snippet-body.kind-text text {
+  font-family: Cantarell, "Noto Sans", "DejaVu Sans", sans-serif;
+  font-size: 14px;
 }
 
 .status-bar {
@@ -185,6 +256,59 @@ textview.snippet-body text {
 
 .search-wrap {
   padding: 8px 10px 6px 10px;
+}
+
+.format-row {
+  padding: 2px 10px 6px 10px;
+}
+
+.md-preview {
+  padding: 14px 20px 24px 20px;
+}
+
+.md-h1 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.md-h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.md-h3, .md-h4, .md-h5, .md-h6 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.md-paragraph, .md-list-item, .md-quote {
+  font-size: 14px;
+}
+
+.md-codeblock {
+  font-family: "Source Code Pro", "JetBrains Mono", "Fira Code",
+    "Noto Sans Mono", "DejaVu Sans Mono", monospace;
+  font-size: 12.5px;
+  background-color: alpha(@window_fg_color, 0.06);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.md-quote {
+  opacity: 0.86;
+  padding-left: 12px;
+  border-left: 3px solid alpha(@window_fg_color, 0.28);
+}
+
+.md-hr {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.md-empty {
+  opacity: 0.55;
+  font-style: italic;
+  padding: 24px 8px;
 }
 """
 
@@ -213,7 +337,7 @@ def now_iso() -> str:
 def preview_of(body: str, limit: int = 52) -> str:
     compact = " ".join((body or "").split())
     if not compact:
-        return "Empty snippet"
+        return "Empty"
     return compact if len(compact) <= limit else compact[: limit - 1] + "…"
 
 
@@ -228,10 +352,17 @@ def format_updated(iso: str) -> str:
 
 
 def normalize_snippet(raw: dict) -> dict:
+    fmt = normalize_format(raw.get("format") or raw.get("kind"))
+    language = str(raw.get("language") or "")
+    if fmt == "text" and not language:
+        language = "text"
+    if fmt == "markdown" and not language:
+        language = "markdown"
     return {
         "id": str(raw.get("id") or uuid.uuid4()),
         "title": str(raw.get("title") or ""),
-        "language": str(raw.get("language") or ""),
+        "format": fmt,
+        "language": language,
         "body": str(raw.get("body") or ""),
         "updated": str(raw.get("updated") or now_iso()),
     }
@@ -245,16 +376,25 @@ def matches_query(snippet: dict, query: str) -> bool:
         (
             snippet.get("title") or "",
             snippet.get("language") or "",
+            snippet.get("format") or "",
             snippet.get("body") or "",
         )
     ).casefold()
     return q in haystack
 
 
+def _clear_box(box: Gtk.Box) -> None:
+    child = box.get_first_child()
+    while child is not None:
+        nxt = child.get_next_sibling()
+        box.remove(child)
+        child = nxt
+
+
 class SnippetsWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs) -> None:
         super().__init__(title="Snippets", **kwargs)
-        self.set_default_size(1000, 680)
+        self.set_default_size(1040, 700)
         self.set_icon_name(APP_ID)
 
         self.snippets: list[dict] = []
@@ -262,6 +402,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
         self._loading = False
         self._save_timeout: int | None = None
         self._filter = ""
+        self._last_format = "code"
 
         self._add_icon_search_path()
         self._apply_css()
@@ -270,10 +411,31 @@ class SnippetsWindow(Adw.ApplicationWindow):
         self._load_snippets()
         first = self.snippets[0]["id"] if self.snippets else None
         newest = max(self.snippets, key=lambda s: s.get("updated", ""), default=None)
-        self._refresh_list(select_id=newest["id"] if newest else first)
+        select_id = newest["id"] if newest else first
 
-        if os.environ.get("NOTES_SCREENSHOT") or os.environ.get("SNIPPETS_SCREENSHOT"):
-            GLib.timeout_add(900, self._save_screenshot)
+        screenshot = os.environ.get("NOTES_SCREENSHOT") or os.environ.get(
+            "SNIPPETS_SCREENSHOT"
+        )
+        if screenshot:
+            md = next(
+                (s for s in self.snippets if s.get("format") == "markdown"), None
+            )
+            if md:
+                select_id = md["id"]
+
+        self._refresh_list(select_id=select_id)
+
+        if screenshot:
+            GLib.timeout_add(200, self._prepare_screenshot)
+            GLib.timeout_add(1200, self._save_screenshot)
+
+    def _prepare_screenshot(self) -> bool:
+        if self.current_id:
+            snippet = self._find(self.current_id)
+            if snippet and snippet.get("format") == "markdown":
+                self.view_toggle.set_active_name("preview")
+                self._show_preview()
+        return False
 
     def _add_icon_search_path(self) -> None:
         icon_dir = Path(__file__).resolve().parent.parent / "data" / "icons"
@@ -308,17 +470,28 @@ class SnippetsWindow(Adw.ApplicationWindow):
         find_action.connect("activate", self.on_find)
         self.add_action(find_action)
 
+        preview_action = Gio.SimpleAction.new("toggle-preview", None)
+        preview_action.connect("activate", self.on_toggle_preview)
+        self.add_action(preview_action)
+
         app = self.get_application()
         if app is not None:
             app.set_accels_for_action("win.new-snippet", ["<Control>n"])
             app.set_accels_for_action("win.delete-snippet", ["<Control>Delete"])
             app.set_accels_for_action("win.copy-snippet", ["<Control><Shift>c"])
             app.set_accels_for_action("win.find", ["<Control>f", "<Control>k"])
+            app.set_accels_for_action("win.toggle-preview", ["<Control>p"])
 
         key = Gtk.EventControllerKey()
         key.set_propagation_phase(Gtk.PropagationPhase.CAPTURE)
         key.connect("key-pressed", self._on_key_pressed)
         self.add_controller(key)
+
+    def _make_toggle(self, name: str, label: str) -> Adw.Toggle:
+        toggle = Adw.Toggle()
+        toggle.set_name(name)
+        toggle.set_label(label)
+        return toggle
 
     def _build_ui(self) -> None:
         toolbar = Adw.ToolbarView()
@@ -326,13 +499,13 @@ class SnippetsWindow(Adw.ApplicationWindow):
 
         header = Adw.HeaderBar()
         header.set_title_widget(
-            Adw.WindowTitle(title="Snippets", subtitle="Code scratchpad")
+            Adw.WindowTitle(title="Snippets", subtitle="Code, text, and Markdown")
         )
         toolbar.add_top_bar(header)
 
         new_btn = Gtk.Button()
         new_btn.set_child(Adw.ButtonContent(icon_name="list-add-symbolic", label="New"))
-        new_btn.set_tooltip_text("Create a snippet  (Ctrl+N)")
+        new_btn.set_tooltip_text("Create a note  (Ctrl+N)")
         new_btn.connect("clicked", self.on_new)
         header.pack_start(new_btn)
 
@@ -346,7 +519,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
         del_btn = Gtk.Button()
         del_btn.set_child(Adw.ButtonContent(icon_name="user-trash-symbolic", label="Delete"))
         del_btn.add_css_class("destructive-action")
-        del_btn.set_tooltip_text("Delete the selected snippet")
+        del_btn.set_tooltip_text("Delete the selected item")
         del_btn.connect("clicked", self.on_delete)
         header.pack_end(del_btn)
         self.delete_button = del_btn
@@ -356,7 +529,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
             Adw.ButtonContent(icon_name="edit-copy-symbolic", label="Copy snippet")
         )
         copy_btn.add_css_class("suggested-action")
-        copy_btn.set_tooltip_text("Copy snippet body  (Ctrl+Shift+C)")
+        copy_btn.set_tooltip_text("Copy the body  (Ctrl+Shift+C)")
         copy_btn.connect("clicked", self.on_copy)
         header.pack_end(copy_btn)
         self.copy_button = copy_btn
@@ -381,7 +554,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
         self.listbox.add_css_class("navigation-sidebar")
         self.listbox.connect("row-selected", self.on_row_selected)
 
-        placeholder = Gtk.Label(label="No matching snippets")
+        placeholder = Gtk.Label(label="No matching notes")
         placeholder.add_css_class("dim-label")
         placeholder.set_margin_top(16)
         placeholder.set_margin_bottom(16)
@@ -400,8 +573,8 @@ class SnippetsWindow(Adw.ApplicationWindow):
 
         self.empty_page = Adw.StatusPage(
             icon_name="edit-copy-symbolic",
-            title="No snippet selected",
-            description="Choose a snippet in the sidebar, search, or press Ctrl+N.",
+            title="No note selected",
+            description="Choose an item in the sidebar, search, or press Ctrl+N.",
         )
 
         self.editor_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
@@ -428,8 +601,38 @@ class SnippetsWindow(Adw.ApplicationWindow):
         title_row.append(self.lang_entry)
         self.editor_box.append(title_row)
 
+        format_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        format_row.add_css_class("format-row")
+        format_row.set_hexpand(True)
+
+        self.format_group = Adw.ToggleGroup()
+        self.format_group.set_can_shrink(True)
+        self.format_group.set_hexpand(False)
+        self.format_group.add(self._make_toggle("code", "Code"))
+        self.format_group.add(self._make_toggle("text", "Plain text"))
+        self.format_group.add(self._make_toggle("markdown", "Markdown"))
+        self.format_group.set_active_name("code")
+        self.format_group.set_tooltip_text("Write as code, plain text, or Markdown")
+        self.format_group.connect("notify::active-name", self.on_format_changed)
+        format_row.append(self.format_group)
+
+        spacer = Gtk.Box()
+        spacer.set_hexpand(True)
+        format_row.append(spacer)
+
+        self.view_toggle = Adw.ToggleGroup()
+        self.view_toggle.set_can_shrink(True)
+        self.view_toggle.add(self._make_toggle("edit", "Edit"))
+        self.view_toggle.add(self._make_toggle("preview", "Preview"))
+        self.view_toggle.set_active_name("edit")
+        self.view_toggle.set_tooltip_text("Toggle Markdown preview  (Ctrl+P)")
+        self.view_toggle.connect("notify::active-name", self.on_view_changed)
+        format_row.append(self.view_toggle)
+        self.editor_box.append(format_row)
+
         self.body_view = Gtk.TextView()
         self.body_view.add_css_class("snippet-body")
+        self.body_view.add_css_class("kind-code")
         self.body_view.set_wrap_mode(Gtk.WrapMode.NONE)
         self.body_view.set_monospace(True)
         self.body_view.set_left_margin(16)
@@ -445,7 +648,22 @@ class SnippetsWindow(Adw.ApplicationWindow):
         body_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         body_scroll.set_vexpand(True)
         body_scroll.set_child(self.body_view)
-        self.editor_box.append(body_scroll)
+
+        self.preview_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.preview_box.add_css_class("md-preview")
+        self.preview_box.set_hexpand(True)
+
+        preview_scroll = Gtk.ScrolledWindow()
+        preview_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        preview_scroll.set_vexpand(True)
+        preview_scroll.set_child(self.preview_box)
+
+        self.editor_stack = Gtk.Stack()
+        self.editor_stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+        self.editor_stack.set_vexpand(True)
+        self.editor_stack.add_named(body_scroll, "edit")
+        self.editor_stack.add_named(preview_scroll, "preview")
+        self.editor_box.append(self.editor_stack)
 
         self.stack = Gtk.Stack()
         self.stack.set_transition_type(Gtk.StackTransitionType.NONE)
@@ -487,19 +705,23 @@ class SnippetsWindow(Adw.ApplicationWindow):
         except (OSError, json.JSONDecodeError):
             return []
         items: list | None
+        extra_format = "code"
         if isinstance(data, dict):
             items = data.get("snippets") or data.get("notes")
+            extra_format = normalize_format(data.get("last_format") or "code")
         elif isinstance(data, list):
             items = data
         else:
             items = None
+        if extra_format in FORMATS:
+            self._last_format = extra_format
         if not isinstance(items, list) or not items:
             return []
         return [normalize_snippet(item) for item in items if isinstance(item, dict)]
 
     def _write_snippets(self) -> None:
         path = snippets_file()
-        payload = {"snippets": self.snippets}
+        payload = {"snippets": self.snippets, "last_format": self._last_format}
         tmp = path.with_suffix(".json.tmp")
         tmp.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         os.replace(tmp, path)
@@ -556,7 +778,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
         title.set_hexpand(True)
         title.set_max_width_chars(24)
 
-        lang = Gtk.Label(label=snippet.get("language") or "", xalign=1)
+        lang = Gtk.Label(label=sidebar_kind(snippet), xalign=1)
         lang.add_css_class("snippet-lang")
         lang.add_css_class("dim-label")
         lang.set_ellipsize(Pango.EllipsizeMode.END)
@@ -580,17 +802,17 @@ class SnippetsWindow(Adw.ApplicationWindow):
         self.delete_button.set_sensitive(False)
         self.copy_button.set_sensitive(False)
         if self._filter and self.snippets:
-            self.empty_page.set_title("No matching snippets")
+            self.empty_page.set_title("No matching notes")
             self.empty_page.set_description("Try another search, or press Ctrl+N.")
             self.status.set_text("No matches")
         elif not self.snippets:
-            self.empty_page.set_title("No snippets yet")
+            self.empty_page.set_title("No notes yet")
             self.empty_page.set_description("Press Ctrl+N to create one.")
-            self.status.set_text("No snippets yet")
+            self.status.set_text("No notes yet")
         else:
-            self.empty_page.set_title("No snippet selected")
+            self.empty_page.set_title("No note selected")
             self.empty_page.set_description(
-                "Choose a snippet in the sidebar, search, or press Ctrl+N."
+                "Choose an item in the sidebar, search, or press Ctrl+N."
             )
             self.status.set_text("Ready")
 
@@ -622,17 +844,163 @@ class SnippetsWindow(Adw.ApplicationWindow):
             return
         self._load_snippet_into_editor(snippet)
 
+    def _current_format(self) -> str:
+        name = self.format_group.get_active_name()
+        return name if name in FORMATS else "code"
+
+    def _apply_format_ui(self, fmt: str) -> None:
+        fmt = normalize_format(fmt)
+        is_code = fmt == "code"
+        is_md = fmt == "markdown"
+        is_text = fmt == "text"
+
+        self.lang_entry.set_visible(is_code)
+        self.view_toggle.set_visible(is_md)
+
+        for kind in FORMATS:
+            self.body_view.remove_css_class(f"kind-{kind}")
+        self.body_view.add_css_class(f"kind-{fmt}")
+        self.body_view.set_monospace(not is_text)
+        if is_code:
+            self.body_view.set_wrap_mode(Gtk.WrapMode.NONE)
+        else:
+            self.body_view.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+
+        if not is_md:
+            if self.view_toggle.get_active_name() != "edit":
+                self.view_toggle.set_active_name("edit")
+            self.editor_stack.set_visible_child_name("edit")
+
+    def on_format_changed(self, *_args) -> None:
+        fmt = self._current_format()
+        self._apply_format_ui(fmt)
+        if self._loading or not self.current_id:
+            return
+        snippet = self._find(self.current_id)
+        if not snippet:
+            return
+        snippet["format"] = fmt
+        if fmt == "text" and not (snippet.get("language") or "").strip():
+            snippet["language"] = "text"
+        elif fmt == "markdown" and not (snippet.get("language") or "").strip():
+            snippet["language"] = "markdown"
+        self._last_format = fmt
+        snippet["updated"] = now_iso()
+        self.status.set_text("Saving…")
+        if self._save_timeout is not None:
+            GLib.source_remove(self._save_timeout)
+        self._save_timeout = GLib.timeout_add(350, self._autosave)
+
+    def on_view_changed(self, *_args) -> None:
+        if self._current_format() != "markdown":
+            self.editor_stack.set_visible_child_name("edit")
+            return
+        if self.view_toggle.get_active_name() == "preview":
+            self._show_preview()
+        else:
+            self.editor_stack.set_visible_child_name("edit")
+
+    def on_toggle_preview(self, *_args) -> None:
+        if self._current_format() != "markdown":
+            return
+        current = self.view_toggle.get_active_name()
+        self.view_toggle.set_active_name("edit" if current == "preview" else "preview")
+
+    def _markup_label(self, markup: str, *css: str) -> Gtk.Label:
+        label = Gtk.Label()
+        label.set_markup(markup)
+        label.set_wrap(True)
+        label.set_wrap_mode(Pango.WrapMode.WORD_CHAR)
+        label.set_xalign(0)
+        label.set_selectable(True)
+        label.set_hexpand(True)
+        for name in css:
+            label.add_css_class(name)
+        return label
+
+    def _show_preview(self) -> None:
+        _clear_box(self.preview_box)
+        body = self._editor_body()
+        if not body.strip():
+            empty = Gtk.Label(label="Nothing to preview")
+            empty.add_css_class("md-empty")
+            empty.add_css_class("dim-label")
+            empty.set_xalign(0)
+            self.preview_box.append(empty)
+            self.editor_stack.set_visible_child_name("preview")
+            return
+
+        for block in parse_markdown(body):
+            kind = block.get("type")
+            if kind == "heading":
+                level = max(1, min(int(block.get("level") or 1), 6))
+                self.preview_box.append(
+                    self._markup_label(
+                        inline_to_pango(block.get("text") or ""),
+                        f"md-h{level}",
+                    )
+                )
+            elif kind == "paragraph":
+                self.preview_box.append(
+                    self._markup_label(
+                        inline_to_pango(block.get("text") or ""),
+                        "md-paragraph",
+                    )
+                )
+            elif kind == "quote":
+                self.preview_box.append(
+                    self._markup_label(
+                        inline_to_pango(block.get("text") or ""),
+                        "md-quote",
+                    )
+                )
+            elif kind == "code":
+                text = block.get("text") or ""
+                code = Gtk.Label(label=text)
+                code.set_xalign(0)
+                code.set_selectable(True)
+                code.set_wrap(True)
+                code.set_wrap_mode(Pango.WrapMode.CHAR)
+                code.add_css_class("md-codeblock")
+                code.set_hexpand(True)
+                self.preview_box.append(code)
+            elif kind == "hr":
+                rule = Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+                rule.add_css_class("md-hr")
+                self.preview_box.append(rule)
+            elif kind in ("ul", "ol"):
+                items = block.get("items") or []
+                for index, item in enumerate(items, start=1):
+                    row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+                    bullet = Gtk.Label(label=f"{index}." if kind == "ol" else "•")
+                    bullet.set_xalign(0)
+                    bullet.add_css_class("dim-label")
+                    bullet.set_width_chars(2)
+                    row.append(bullet)
+                    row.append(
+                        self._markup_label(inline_to_pango(item), "md-list-item")
+                    )
+                    self.preview_box.append(row)
+
+        self.editor_stack.set_visible_child_name("preview")
+
     def _load_snippet_into_editor(self, snippet: dict) -> None:
         self._loading = True
         self.current_id = snippet["id"]
         self.title_entry.set_text(snippet.get("title", ""))
         self.lang_entry.set_text(snippet.get("language", ""))
         self.body_buffer.set_text(snippet.get("body", ""))
+        fmt = normalize_format(snippet.get("format"))
+        if self.format_group.get_active_name() != fmt:
+            self.format_group.set_active_name(fmt)
+        self._apply_format_ui(fmt)
+        if self.view_toggle.get_active_name() != "edit":
+            self.view_toggle.set_active_name("edit")
+        self.editor_stack.set_visible_child_name("edit")
+        self._last_format = fmt
         self._show_editor()
         self.status.set_text(f"Edited  {format_updated(snippet.get('updated', ''))}")
         self._loading = False
-        if os.environ.get("NOTES_SCREENSHOT") or os.environ.get("SNIPPETS_SCREENSHOT"):
-            self.body_view.grab_focus()
 
     def on_editor_changed(self, *_args) -> None:
         if self._loading or not self.current_id:
@@ -642,10 +1010,10 @@ class SnippetsWindow(Adw.ApplicationWindow):
             return
         snippet["title"] = self.title_entry.get_text()
         snippet["language"] = self.lang_entry.get_text().strip()
-        start = self.body_buffer.get_start_iter()
-        end = self.body_buffer.get_end_iter()
-        snippet["body"] = self.body_buffer.get_text(start, end, True)
+        snippet["format"] = self._current_format()
+        snippet["body"] = self._editor_body()
         snippet["updated"] = now_iso()
+        self._last_format = snippet["format"]
         self.status.set_text("Saving…")
         if self._save_timeout is not None:
             GLib.source_remove(self._save_timeout)
@@ -689,7 +1057,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
             kid = kid.get_next_sibling()
         if len(top_kids) >= 2:
             top_kids[0].set_text(snippet.get("title") or "Untitled")
-            top_kids[1].set_text(snippet.get("language") or "")
+            top_kids[1].set_text(sidebar_kind(snippet))
         children[1].set_text(preview_of(snippet.get("body", "")))
 
     def _editor_body(self) -> str:
@@ -743,10 +1111,17 @@ class SnippetsWindow(Adw.ApplicationWindow):
         if self._filter:
             self._filter = ""
             self.search.set_text("")
+        fmt = self._last_format if self._last_format in FORMATS else "code"
+        language = ""
+        if fmt == "text":
+            language = "text"
+        elif fmt == "markdown":
+            language = "markdown"
         snippet = {
             "id": str(uuid.uuid4()),
             "title": "Untitled",
-            "language": "",
+            "format": fmt,
+            "language": language,
             "body": "",
             "updated": now_iso(),
         }
@@ -755,7 +1130,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
         self._refresh_list(select_id=snippet["id"])
         self.title_entry.grab_focus()
         self.title_entry.select_region(0, -1)
-        self.status.set_text("New snippet")
+        self.status.set_text("New snippet" if fmt == "code" else "New note")
 
     def on_delete(self, *_args) -> None:
         if not self.current_id:
@@ -787,7 +1162,7 @@ class SnippetsWindow(Adw.ApplicationWindow):
         visible = self._visible()
         next_id = visible[0]["id"] if visible else None
         self._refresh_list(select_id=next_id)
-        self.status.set_text("Snippet deleted")
+        self.status.set_text("Deleted")
 
     def _save_screenshot(self) -> bool:
         path = os.environ.get("SNIPPETS_SCREENSHOT") or os.environ.get("NOTES_SCREENSHOT")
@@ -825,3 +1200,4 @@ class SnippetsWindow(Adw.ApplicationWindow):
         if app is not None:
             app.quit()
         return False
+
