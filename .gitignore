@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 *.so
 notes.json
+snippets.json
 /build/
 /builddir/
 /_build/

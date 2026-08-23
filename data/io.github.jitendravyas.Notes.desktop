@@ -1,13 +1,13 @@
 [Desktop Entry]
-Name=Notes
-GenericName=Notes
-Comment=Write and keep simple local notes
+Name=Snippets
+GenericName=Code Snippet Scratchpad
+Comment=Save and copy local code snippets
 Exec=notes
 Icon=io.github.jitendravyas.Notes
 Terminal=false
 Type=Application
-Categories=Utility;Office;
-Keywords=notes;notepad;text;memo;write;
+Categories=Utility;Development;
+Keywords=snippets;code;scratchpad;clipboard;bash;python;git;
 StartupNotify=true
 StartupWMClass=io.github.jitendravyas.Notes
 DBusActivatable=true

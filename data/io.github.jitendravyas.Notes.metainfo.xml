@@ -3,24 +3,25 @@
   <id>io.github.jitendravyas.Notes</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
-  <name>Notes</name>
-  <summary>Write and keep simple local notes</summary>
+  <name>Snippets</name>
+  <summary>Save and copy local code snippets</summary>
   <developer id="io.github.jitendravyas">
     <name>Jitendra Vyas</name>
   </developer>
   <description>
     <p>
-      Notes is a small desktop app for writing things down and keeping them on
-      your computer. Pick a note in the sidebar, edit the title or body, and
-      changes save on their own.
+      Snippets is a local code snippet scratchpad for Linux. Keep the commands
+      and fragments you reuse — pacman, git, ssh, python, rsync — search them
+      instantly, and copy the body to the clipboard in one action.
     </p>
     <p>Features:</p>
     <ul>
-      <li>Sidebar list with title and preview</li>
-      <li>Title and body editor</li>
-      <li>New note, and delete with confirmation</li>
+      <li>Sidebar list with title, language, and a one-line preview</li>
+      <li>Instant search across title, language, and body</li>
+      <li>Title, language tag, and monospace editor</li>
+      <li>Copy snippet (toolbar, Ctrl+Shift+C, or Ctrl+C when nothing is selected)</li>
+      <li>New snippet (Ctrl+N) and delete with confirmation</li>
       <li>Automatic save to your user data directory</li>
-      <li>Keyboard shortcut: Ctrl+N for a new note</li>
     </ul>
   </description>
   <url type="homepage">https://github.com/jitendravyas/omarchy-notes</url>
@@ -46,24 +47,26 @@
   <releases>
     <release version="0.1.0" date="2026-08-23">
       <description>
-        <p>First packaged release as a GTK 4 and libadwaita desktop app.</p>
+        <p>Code snippet scratchpad: search, language tags, and one-click copy.</p>
       </description>
     </release>
   </releases>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/jitendravyas/omarchy-notes/main/screenshot.png</image>
-      <caption>Sidebar of notes and the title and body editor</caption>
+      <caption>Sidebar of snippets and the title, language, and body editor</caption>
     </screenshot>
   </screenshots>
   <categories>
     <category>Utility</category>
-    <category>Office</category>
+    <category>Development</category>
   </categories>
   <keywords>
-    <keyword>notes</keyword>
-    <keyword>notepad</keyword>
-    <keyword>text</keyword>
-    <keyword>memo</keyword>
+    <keyword>snippets</keyword>
+    <keyword>code</keyword>
+    <keyword>scratchpad</keyword>
+    <keyword>clipboard</keyword>
+    <keyword>bash</keyword>
+    <keyword>python</keyword>
   </keywords>
 </component>

@@ -4,7 +4,7 @@
 pkgname=omarchy-notes
 pkgver=0.1.0
 pkgrel=1
-pkgdesc="Simple notes app for the Linux desktop"
+pkgdesc="Local code snippet scratchpad for the Linux desktop"
 arch=('any')
 url="https://github.com/jitendravyas/omarchy-notes"
 license=('MIT')

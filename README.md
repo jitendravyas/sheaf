@@ -1,13 +1,24 @@
-# Notes
+# Snippets
 
-A simple notes app for the Linux desktop. It uses GTK 4 and libadwaita, with a
-sidebar of notes and a title and body editor.
+A local **code snippet scratchpad** for Linux. Keep the commands and fragments
+you actually reuse, find them instantly, and copy the body to the clipboard.
 
-This project is **not** on Flathub yet, and it is **not** published to the AUR
+It uses GTK 4 and libadwaita. The window title is **Snippets**. The application
+id is still `io.github.jitendravyas.Notes` so existing desktop, D-Bus, and
+data-directory paths stay stable.
+
+This project is **not** on Flathub, and it is **not** published to the AUR
 or other distribution repositories. It has not been widely tested on Linux
 desktops yet.
 
-![Notes app](screenshot.png)
+![Snippets app](screenshot.png)
+
+## Why this exists
+
+Omarchy and Arch developers already live in a terminal. Snippets is for the
+stuff you should not have to remember: a pacman / `omarchy pkg` line, a git
+undo, an ssh `Host` block, a Python venv, an rsync exclude list. First launch
+seeds a few of those. After that it is your scratchpad.
 
 ## Install on Omarchy
 
@@ -75,14 +86,15 @@ sudo pacman -S meson ninja
 python3 src/main.py
 ```
 
-Notes are stored in your user data directory, not next to the source files:
+Snippets are stored in your user data directory, not next to the source files:
 
-`$XDG_DATA_HOME/io.github.jitendravyas.Notes/notes.json`
+`$XDG_DATA_HOME/io.github.jitendravyas.Notes/snippets.json`
 
-If `XDG_DATA_HOME` is unset, that is `~/.local/share/io.github.jitendravyas.Notes/notes.json`.
+If `XDG_DATA_HOME` is unset, that is
+`~/.local/share/io.github.jitendravyas.Notes/snippets.json`.
 
-The first launch seeds a few sample notes. After that, New, Delete, and edits
-are saved automatically.
+Each item is `{id, title, language, body, updated}`. The first launch seeds a
+few useful snippets. After that, New, Delete, and edits are saved automatically.
 
 ## Build and install with Meson
 
@@ -92,8 +104,8 @@ meson compile -C builddir
 sudo meson install -C builddir
 ```
 
-This installs the `notes` command, a desktop entry, AppStream metadata, and the
-application icon so the app appears in your application menu.
+This installs the `notes` command, a desktop entry named Snippets, AppStream
+metadata, and the application icon so the app appears in your application menu.
 
 ## Build with makepkg (Arch / Omarchy)
 
@@ -121,9 +133,11 @@ flatpak run io.github.jitendravyas.Notes
 
 ## Features
 
-- Sidebar list of notes with title and preview
-- Title and body editor
-- New note (toolbar or Ctrl+N)
+- Sidebar list of snippets with title, language, and a one-line preview
+- Instant search (title, language, or body)
+- Title, language tag, and monospace body editor
+- Copy snippet (toolbar button, Ctrl+Shift+C, or Ctrl+C when you are not selecting text)
+- New snippet (toolbar or Ctrl+N)
 - Delete with confirmation
 - Autosave
 - Single-instance application (`io.github.jitendravyas.Notes`)

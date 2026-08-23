@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <title>Notes</title>
+  <title>Snippets</title>
   <defs>
     <linearGradient id="pad" x1="24" y1="12" x2="104" y2="116" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fff4c2"/>

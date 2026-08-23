@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-"""Notes — GTK 4 / libadwaita desktop app."""
+"""Snippets — GTK 4 / libadwaita code snippet scratchpad."""
 
 from __future__ import annotations
 
@@ -16,10 +16,10 @@ from gi.repository import Adw, Gio, Gtk  # noqa: E402
 # Allow `python3 src/main.py` before Meson install.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from window import APP_ID, NotesWindow  # noqa: E402
+from window import APP_ID, SnippetsWindow  # noqa: E402
 
 
-class NotesApplication(Adw.Application):
+class SnippetsApplication(Adw.Application):
     def __init__(self) -> None:
         super().__init__(
             application_id=APP_ID,
@@ -31,7 +31,7 @@ class NotesApplication(Adw.Application):
     def do_activate(self) -> None:
         win = self.props.active_window
         if win is None:
-            win = NotesWindow(application=self)
+            win = SnippetsWindow(application=self)
         win.present()
 
     def create_action(self, name: str, callback, shortcuts: list[str] | None = None) -> None:
@@ -46,14 +46,14 @@ class NotesApplication(Adw.Application):
 
     def on_about(self, *_args) -> None:
         dialog = Adw.AboutDialog(
-            application_name="Notes",
+            application_name="Snippets",
             application_icon=APP_ID,
             developer_name="Jitendra Vyas",
             version="0.1.0",
             website="https://github.com/jitendravyas/omarchy-notes",
             issue_url="https://github.com/jitendravyas/omarchy-notes/issues",
             license_type=Gtk.License.MIT_X11,
-            comments="A simple notes app for the Linux desktop.",
+            comments="A local code snippet scratchpad for the Linux desktop.",
             developers=["Jitendra Vyas"],
             copyright="© 2026 Jitendra Vyas",
         )
@@ -61,7 +61,7 @@ class NotesApplication(Adw.Application):
 
 
 def main() -> int:
-    app = NotesApplication()
+    app = SnippetsApplication()
     return app.run(sys.argv)
 
 
