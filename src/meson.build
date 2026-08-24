@@ -6,8 +6,8 @@ conf.set('PYTHON', py_installation.full_path())
 conf.set('pkgdatadir', pkgdatadir)
 
 configure_file(
-  input: 'notes.in',
-  output: 'notes',
+  input: 'sheaf.in',
+  output: 'sheaf',
   configuration: conf,
   install: true,
   install_dir: get_option('bindir'),

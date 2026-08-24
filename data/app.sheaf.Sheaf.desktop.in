@@ -3,7 +3,7 @@
 Name=Sheaf
 GenericName=Code, Text, and Markdown Scratchpad
 Comment=Save code snippets, plain text, and Markdown notes
-Exec=notes
+Exec=sheaf
 Icon=app.sheaf.Sheaf
 Terminal=false
 Type=Application

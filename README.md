@@ -6,6 +6,12 @@ A local scratchpad for Linux. Keep the commands and fragments you reuse, jot a r
 
 Sheaf is not in Flathub, the AUR, or other software stores yet. Install it from this repo.
 
+## Install
+
+On Arch and Omarchy, install **sheaf** from the AUR (search in the software installer, or `yay -S sheaf`) once it is listed. On other desktops, install it from Flathub once the listing is up.
+
+Until then, run it from this repo.
+
 ## Try it
 
 Needs Python 3, GTK 4, libadwaita, GtkSourceView 5, and PyGObject.
@@ -28,7 +34,7 @@ cd sheaf
 python3 src/main.py
 ```
 
-To put **Sheaf** in your app menu, install with Meson (see [Build](#build)). The command name is `notes`.
+To put **Sheaf** in your app menu, install with Meson (see [Build](#build)). The command name is `sheaf`.
 
 ## Use it
 
@@ -61,7 +67,7 @@ On Omarchy, copy `data/omarchy/sheaf.css.tpl` to `~/.config/omarchy/themed/` to 
 
 ## Build
 
-To install a launcher, icon, and the `notes` command:
+To install a launcher, icon, and the `sheaf` command:
 
 ```bash
 # Arch extra build tools

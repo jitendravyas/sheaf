@@ -3,7 +3,7 @@
     "runtime": "org.gnome.Platform",
     "runtime-version": "48",
     "sdk": "org.gnome.Sdk",
-    "command": "notes",
+    "command": "sheaf",
     "finish-args": [
         "--share=ipc",
         "--socket=fallback-x11",
@@ -21,7 +21,7 @@
     ],
     "modules": [
         {
-            "name": "notes",
+            "name": "sheaf",
             "buildsystem": "meson",
             "config-opts": [
                 "--prefix=/app"
