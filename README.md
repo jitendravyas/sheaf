@@ -1,73 +1,83 @@
 # Sheaf
 
-Local GTK 4 / libadwaita scratchpad for code snippets, plain text, and Markdown notes. Search, copy a body to the clipboard, and save under `$XDG_DATA_HOME`. The window title is **Sheaf**. The application id is `app.sheaf.Sheaf`. On first run, snippets.json and window.json are copied from the previous data directory if present.
+A local scratchpad for Linux. Keep the commands and fragments you reuse, jot a reminder, or draft Markdown. Search, copy, paste somewhere else. Nothing leaves this computer.
 
-This project is not on Flathub and is not published to the AUR or other distribution repositories. It has not been widely tested.
+![Sheaf](screenshot.png)
 
-![Sheaf app](screenshot.png)
+Sheaf is not in Flathub, the AUR, or other software stores yet. Install it from this repo.
 
-## Requirements
+## Try it
 
-- Python 3
-- GTK 4
-- libadwaita
-- GtkSourceView 5
-- PyGObject
+Needs Python 3, GTK 4, libadwaita, GtkSourceView 5, and PyGObject.
 
-On Debian or Ubuntu:
+**Arch / Omarchy**
 
 ```bash
-sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5 meson ninja-build gettext desktop-file-utils appstream
-```
-
-On Arch Linux:
-
-```bash
-sudo pacman -S python python-gobject gtk4 libadwaita gtksourceview5 meson ninja gettext desktop-file-utils appstream
-```
-
-## Run from source
-
-```bash
+sudo pacman -S python python-gobject gtk4 libadwaita gtksourceview5
+git clone https://github.com/jitendravyas/sheaf.git
+cd sheaf
 python3 src/main.py
 ```
 
-Notes are stored at `$XDG_DATA_HOME/app.sheaf.Sheaf/snippets.json` (or `~/.local/share/app.sheaf.Sheaf/snippets.json` if `XDG_DATA_HOME` is unset).
-
-Each item is `{id, title, format, language, body, updated}`. `format` is `code`, `text`, or `markdown`. First launch starts empty. New asks for Code, Plain text, or Markdown once; that type is then locked. Edits autosave.
-
-## Build and install with Meson
+**Debian / Ubuntu**
 
 ```bash
+sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-4.0 gir1.2-adw-1 gir1.2-gtksource-5
+git clone https://github.com/jitendravyas/sheaf.git
+cd sheaf
+python3 src/main.py
+```
+
+To put **Sheaf** in your app menu, install with Meson (see [Build](#build)). The command name is `notes`.
+
+## Use it
+
+First launch is empty. Press **Ctrl+N** (or the + button) and pick a type once:
+
+- **Code** — syntax highlighting; language is detected when you paste
+- **Plain text** — a note with no formatting
+- **Markdown** — write Markdown, preview with **Ctrl+P**
+
+Type is locked after that. Edits save by themselves.
+
+In the list, search by title or body (**Ctrl+F**). Copy a note without opening it (the copy button on the row, or **Ctrl+Shift+C**). Pin favorites so they stay at the top. Delete is undoable from the toast that appears.
+
+Notes live in `~/.local/share/app.sheaf.Sheaf/`. If you used an older build, they are copied here on first run.
+
+On Omarchy, copy `data/omarchy/sheaf.css.tpl` to `~/.config/omarchy/themed/` to follow the active palette. Otherwise Sheaf uses Adwaita.
+
+## Keyboard shortcuts
+
+| Action | Keys |
+| --- | --- |
+| New note | Ctrl+N |
+| Search | Ctrl+F or Ctrl+K |
+| Copy body | Ctrl+Shift+C |
+| Pin or unpin | Ctrl+Shift+P |
+| Delete (undo from the toast) | Ctrl+Delete |
+| Markdown preview | Ctrl+P |
+| Show or hide the list | F9 |
+| All shortcuts | Ctrl+? |
+
+## Build
+
+To install a launcher, icon, and the `notes` command:
+
+```bash
+# Arch extra build tools
+sudo pacman -S meson ninja gettext desktop-file-utils appstream
+
+# Debian / Ubuntu extra build tools
+sudo apt install meson ninja-build gettext desktop-file-utils appstream
+
 meson setup builddir
 meson compile -C builddir
 meson test -C builddir --print-errorlogs
 sudo meson install -C builddir
 ```
 
-This installs the `notes` command, a desktop entry named Sheaf, AppStream metadata, and the application icon.
-
-## Build with makepkg
-
-The `PKGBUILD` in this repo builds package `sheaf` from https://github.com/jitendravyas/sheaf. It is a template only — the package is not on the AUR.
-
-```bash
-makepkg -si
-```
-
-## Build a Flatpak locally
-
-The Flatpak manifest is for local packaging tests. There is no Flathub listing.
-
-```bash
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install flathub org.gnome.Platform//48 org.gnome.Sdk//48
-flatpak-builder --user --install --force-clean build-flatpak app.sheaf.Sheaf.json
-flatpak run app.sheaf.Sheaf
-```
-
-Optional Omarchy theme: copy `data/omarchy/sheaf.css.tpl` to `~/.config/omarchy/themed/` so Sheaf can follow the active palette; otherwise it uses Adwaita.
+There is a `PKGBUILD` (package name `sheaf`) and a Flatpak manifest for local packaging tests. Neither is published.
 
 ## License
 
-MIT License. Copyright 2026 Jitendra Vyas.
+MIT. Copyright 2026 Jitendra Vyas.
