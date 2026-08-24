@@ -9,6 +9,13 @@ from __future__ import annotations
 
 import html
 import re
+from urllib.parse import urlparse
+
+PREVIEW_MAX_LINES = 400
+PREVIEW_MAX_BYTES = 64 * 1024
+
+_ALLOWED_LINK_SCHEMES = frozenset({"http", "https"})
+_BLOCKED_LINK_SCHEMES = frozenset({"javascript", "data", "file", "vbscript"})
 
 _HEADING = re.compile(r"^(#{1,6})\s+(.*)$")
 _UL = re.compile(r"^(\s*)[-*+]\s+(.*)$")
@@ -34,6 +41,44 @@ def _esc(text: str) -> str:
     return html.escape(text, quote=False)
 
 
+def safe_href(url: str) -> str | None:
+    """Return *url* only when it is an http(s) link; otherwise None.
+
+    Rejects javascript:, data:, file:, vbscript:, and relative or local paths.
+    """
+    raw = (url or "").strip()
+    if not raw or any(ord(ch) < 32 for ch in raw):
+        return None
+    # Relative / local file paths — never treat as links.
+    if raw.startswith(("/", ".", "\\")) or ":" not in raw:
+        return None
+    try:
+        parsed = urlparse(raw)
+    except ValueError:
+        return None
+    scheme = (parsed.scheme or "").casefold()
+    if scheme in _BLOCKED_LINK_SCHEMES or scheme not in _ALLOWED_LINK_SCHEMES:
+        return None
+    if not parsed.netloc:
+        return None
+    return raw
+
+
+def cap_markdown_source(source: str) -> tuple[str, bool]:
+    """Limit preview input to the first 400 lines or 64 KiB."""
+    text = source or ""
+    truncated = False
+    lines = text.split("\n")
+    if len(lines) > PREVIEW_MAX_LINES:
+        text = "\n".join(lines[:PREVIEW_MAX_LINES])
+        truncated = True
+    encoded = text.encode("utf-8")
+    if len(encoded) > PREVIEW_MAX_BYTES:
+        text = encoded[:PREVIEW_MAX_BYTES].decode("utf-8", errors="ignore")
+        truncated = True
+    return text, truncated
+
+
 def inline_to_pango(text: str) -> str:
     """Turn a conservative inline subset into Pango markup."""
     parts: list[str] = []
@@ -43,8 +88,12 @@ def inline_to_pango(text: str) -> str:
         if match.group(1) is not None:
             parts.append(f"<tt>{_esc(match.group(1))}</tt>")
         elif match.group(2) is not None:
-            url = html.escape(match.group(3).strip(), quote=True)
-            parts.append(f'<a href="{url}">{_esc(match.group(2))}</a>')
+            href = safe_href(match.group(3))
+            if href is not None:
+                url = html.escape(href, quote=True)
+                parts.append(f'<a href="{url}">{_esc(match.group(2))}</a>')
+            else:
+                parts.append(_esc(match.group(2)))
         elif match.group(4) is not None:
             parts.append(f"<b><i>{_esc(match.group(4))}</i></b>")
         elif match.group(5) is not None:

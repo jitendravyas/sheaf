@@ -1,20 +1,20 @@
 # Maintainer: Jitendra Vyas <77309+jitendravyas@users.noreply.github.com>
 # Starting point for the Arch User Repository. Not published on the AUR yet.
 
-pkgname=omarchy-notes
+pkgname=sheaf
 pkgver=0.1.0
 pkgrel=1
-pkgdesc="Local scratchpad for code snippets, plain text, and Markdown notes"
+pkgdesc="Sheaf — local scratchpad for code snippets, plain text, and Markdown notes"
 arch=('any')
-url="https://github.com/jitendravyas/omarchy-notes"
+url="https://github.com/jitendravyas/sheaf"
 license=('MIT')
-depends=('gtk4' 'libadwaita' 'python' 'python-gobject')
-makedepends=('meson' 'ninja' 'git')
-source=("git+https://github.com/jitendravyas/omarchy-notes.git#branch=main")
+depends=('gtk4' 'libadwaita' 'gtksourceview5' 'python' 'python-gobject')
+makedepends=('meson' 'ninja' 'git' 'gettext')
+source=("git+https://github.com/jitendravyas/sheaf.git#branch=main")
 sha256sums=('SKIP')
 
 pkgver() {
-  cd "$srcdir/omarchy-notes"
+  cd "$srcdir/sheaf"
   local describe
   if describe=$(git describe --long --tags --abbrev=7 2>/dev/null); then
     echo "$describe" | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
@@ -24,7 +24,7 @@ pkgver() {
 }
 
 build() {
-  art="$srcdir/omarchy-notes"
+  art="$srcdir/sheaf"
   if command -v arch-meson >/dev/null 2>&1; then
     arch-meson "$art" build
   else
@@ -35,5 +35,5 @@ build() {
 
 package() {
   meson install -C build --destdir "$pkgdir"
-  install -Dm644 "$srcdir/omarchy-notes/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "$srcdir/sheaf/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

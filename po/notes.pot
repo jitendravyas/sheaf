@@ -1,0 +1,133 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the notes package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: notes\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-23 18:51+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: Application name shown in menus and the desktop. Keep as Sheaf.
+#: data/app.sheaf.Sheaf.desktop.in:3
+#: data/app.sheaf.Sheaf.metainfo.xml.in:6
+msgid "Sheaf"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.desktop.in:4
+msgid "Code, Text, and Markdown Scratchpad"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.desktop.in:5
+#: data/app.sheaf.Sheaf.metainfo.xml.in:7
+msgid "Save code snippets, plain text, and Markdown notes"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.desktop.in:11
+msgid "snippets;code;text;markdown;notes;scratchpad;clipboard;bash;python;git;"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:9
+msgid "Jitendra Vyas"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:12
+msgid ""
+"Sheaf is a local scratchpad for Linux. Keep the commands and fragments you "
+"reuse — pacman, git, ssh, python, rsync — write a plain text reminder, or "
+"draft Markdown. Search instantly and copy the body to the clipboard in one "
+"action."
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:18
+msgid "Features:"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:20
+msgid "Write each item as code, plain text, or Markdown"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:21
+msgid ""
+"Sidebar list with title, format tag (bash / text / md), and a one-line "
+"preview"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:22
+msgid "Instant search across title, language, and body"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:23
+msgid "Code mode highlights syntax and auto-detects language on paste"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:24
+msgid "Markdown preview for headings, lists, emphasis, code, and links"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:25
+msgid ""
+"Copy the body from the list, Ctrl+Shift+C, or Ctrl+C when nothing is "
+"selected"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:26
+msgid "New note (Ctrl+N) and delete with undo"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:27
+msgid "Automatic save to your user data directory"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:53
+msgid "Code, plain text, and Markdown notes with search and one-click copy."
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:60
+msgid "Code snippet with syntax highlighting"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:68
+msgid "snippets"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:69
+msgid "code"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:70
+msgid "text"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:71
+msgid "markdown"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:72
+msgid "notes"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:73
+msgid "scratchpad"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:74
+msgid "clipboard"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:75
+msgid "bash"
+msgstr ""
+
+#: data/app.sheaf.Sheaf.metainfo.xml.in:76
+msgid "python"
+msgstr ""

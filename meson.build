@@ -5,13 +5,16 @@ project(
   default_options: ['warning_level=2', 'prefix=/usr'],
 )
 
-app_id = 'io.github.jitendravyas.Notes'
+app_id = 'app.sheaf.Sheaf'
 pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 
+i18n = import('i18n')
 gnome = import('gnome')
 
 subdir('data')
 subdir('src')
+subdir('po')
+subdir('tests')
 
 gnome.post_install(
   gtk_update_icon_cache: true,

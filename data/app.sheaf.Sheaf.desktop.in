@@ -1,13 +1,14 @@
 [Desktop Entry]
-Name=Snippets
+# Translators: Application name shown in menus and the desktop. Keep as Sheaf.
+Name=Sheaf
 GenericName=Code, Text, and Markdown Scratchpad
 Comment=Save code snippets, plain text, and Markdown notes
 Exec=notes
-Icon=io.github.jitendravyas.Notes
+Icon=app.sheaf.Sheaf
 Terminal=false
 Type=Application
 Categories=Utility;Development;
 Keywords=snippets;code;text;markdown;notes;scratchpad;clipboard;bash;python;git;
 StartupNotify=true
-StartupWMClass=io.github.jitendravyas.Notes
+StartupWMClass=app.sheaf.Sheaf
 DBusActivatable=true

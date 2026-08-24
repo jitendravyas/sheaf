@@ -1,0 +1,4 @@
+data/app.sheaf.Sheaf.desktop.in
+data/app.sheaf.Sheaf.metainfo.xml.in
+src/main.py
+src/window.py

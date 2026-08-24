@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.github.jitendravyas.Notes</id>
+  <id>app.sheaf.Sheaf</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
-  <name>Snippets</name>
+  <name>Sheaf</name>
   <summary>Save code snippets, plain text, and Markdown notes</summary>
-  <developer id="io.github.jitendravyas">
+  <developer id="app.sheaf">
     <name>Jitendra Vyas</name>
   </developer>
   <description>
     <p>
-      Snippets is a local scratchpad for Linux. Keep the commands and
+      Sheaf is a local scratchpad for Linux. Keep the commands and
       fragments you reuse — pacman, git, ssh, python, rsync — write a plain
       text reminder, or draft Markdown. Search instantly and copy the body
       to the clipboard in one action.
@@ -20,17 +20,17 @@
       <li>Write each item as code, plain text, or Markdown</li>
       <li>Sidebar list with title, format tag (bash / text / md), and a one-line preview</li>
       <li>Instant search across title, language, and body</li>
-      <li>Code mode keeps a language tag and a monospace editor</li>
+      <li>Code mode highlights syntax and auto-detects language on paste</li>
       <li>Markdown preview for headings, lists, emphasis, code, and links</li>
-      <li>Copy the body (toolbar, Ctrl+Shift+C, or Ctrl+C when nothing is selected)</li>
-      <li>New note (Ctrl+N) and delete with confirmation</li>
+      <li>Copy the body from the list, Ctrl+Shift+C, or Ctrl+C when nothing is selected</li>
+      <li>New note (Ctrl+N) and delete with undo</li>
       <li>Automatic save to your user data directory</li>
     </ul>
   </description>
-  <url type="homepage">https://github.com/jitendravyas/omarchy-notes</url>
-  <url type="bugtracker">https://github.com/jitendravyas/omarchy-notes/issues</url>
-  <url type="vcs-browser">https://github.com/jitendravyas/omarchy-notes</url>
-  <launchable type="desktop-id">io.github.jitendravyas.Notes.desktop</launchable>
+  <url type="homepage">https://github.com/jitendravyas/sheaf</url>
+  <url type="bugtracker">https://github.com/jitendravyas/sheaf/issues</url>
+  <url type="vcs-browser">https://github.com/jitendravyas/sheaf</url>
+  <launchable type="desktop-id">app.sheaf.Sheaf.desktop</launchable>
   <provides>
     <binary>notes</binary>
   </provides>
@@ -56,8 +56,8 @@
   </releases>
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/jitendravyas/omarchy-notes/main/screenshot.png</image>
-      <caption>Markdown note with format control and rendered preview</caption>
+      <image>https://raw.githubusercontent.com/jitendravyas/sheaf/main/screenshot.png</image>
+      <caption>Code snippet with syntax highlighting</caption>
     </screenshot>
   </screenshots>
   <categories>

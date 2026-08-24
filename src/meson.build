@@ -19,6 +19,7 @@ install_data(
     'main.py',
     'window.py',
     'markdown.py',
+    'theme.py',
   ],
   install_dir: pkgdatadir,
 )

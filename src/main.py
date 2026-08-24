@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: MIT
-"""Snippets — GTK 4 / libadwaita scratchpad for code, text, and Markdown."""
+"""Sheaf — GTK 4 / libadwaita scratchpad for code, text, and Markdown."""
 
 from __future__ import annotations
 
@@ -16,10 +16,10 @@ from gi.repository import Adw, Gio, Gtk  # noqa: E402
 # Allow `python3 src/main.py` before Meson install.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from window import APP_ID, SnippetsWindow  # noqa: E402
+from window import APP_ID, SheafWindow  # noqa: E402
 
 
-class SnippetsApplication(Adw.Application):
+class SheafApplication(Adw.Application):
     def __init__(self) -> None:
         super().__init__(
             application_id=APP_ID,
@@ -31,7 +31,7 @@ class SnippetsApplication(Adw.Application):
     def do_activate(self) -> None:
         win = self.props.active_window
         if win is None:
-            win = SnippetsWindow(application=self)
+            win = SheafWindow(application=self)
         win.present()
 
     def create_action(self, name: str, callback, shortcuts: list[str] | None = None) -> None:
@@ -41,17 +41,27 @@ class SnippetsApplication(Adw.Application):
         if shortcuts:
             self.set_accels_for_action(f"app.{name}", shortcuts)
 
+    def _flush_windows(self) -> None:
+        for window in self.get_windows():
+            if isinstance(window, SheafWindow):
+                window.flush_for_quit()
+
     def on_quit(self, *_args) -> None:
+        self._flush_windows()
         self.quit()
+
+    def do_shutdown(self) -> None:
+        self._flush_windows()
+        Adw.Application.do_shutdown(self)
 
     def on_about(self, *_args) -> None:
         dialog = Adw.AboutDialog(
-            application_name="Snippets",
+            application_name="Sheaf",
             application_icon=APP_ID,
             developer_name="Jitendra Vyas",
             version="0.1.0",
-            website="https://github.com/jitendravyas/omarchy-notes",
-            issue_url="https://github.com/jitendravyas/omarchy-notes/issues",
+            website="https://github.com/jitendravyas/sheaf",
+            issue_url="https://github.com/jitendravyas/sheaf/issues",
             license_type=Gtk.License.MIT_X11,
             comments="A local scratchpad for code snippets, plain text, and Markdown notes.",
             developers=["Jitendra Vyas"],
@@ -61,7 +71,7 @@ class SnippetsApplication(Adw.Application):
 
 
 def main() -> int:
-    app = SnippetsApplication()
+    app = SheafApplication()
     return app.run(sys.argv)
 
 
