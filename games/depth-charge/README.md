@@ -1,7 +1,8 @@
 # Depth Charge
 
-A 40-second sonar reflex game. Contacts surface on the grid — strike them before
-they sink, grab the aqua salvage, and keep off the mines.
+A 40-second sonar reflex game. Contacts break the surface of a 3 × 3 sonar
+board — strike them before they sink, grab the aqua salvage, and keep off the
+mines.
 
 | Target  | Worth |
 | ------- | ----- |
@@ -9,8 +10,10 @@ they sink, grab the aqua salvage, and keep off the mines.
 | Salvage | +3    |
 | Mine    | −2    |
 
-There are 66 targets in a run and 71 points on the board. The sweep is the same
-every time, so the only thing that improves is you.
+There are 46 targets in a run and 51 points on the board. Every contact peeks
+above the surface for a beat before it fully rises, so you get a moment's
+warning about where to look. The sweep is the same every time, so the only
+thing that improves is you.
 
 Open `index.html` in any browser. Nothing to install, nothing to build.
 

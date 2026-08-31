@@ -50,7 +50,7 @@ body{
 }
 
 .rig{
-  width:min(820px,100%);
+  width:min(600px,100%,calc(100vh - 250px));
   margin:0;
   touch-action:manipulation;
   -webkit-touch-callout:none;
@@ -107,7 +107,7 @@ h1 span{display:block;color:var(--phosphor);text-shadow:0 0 26px rgba(255,176,58
   position:relative;
   z-index:1;
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:clamp(6px,1.4vw,12px);
 }
 
@@ -136,9 +136,9 @@ h1 span{display:block;color:var(--phosphor);text-shadow:0 0 26px rgba(255,176,58
 .tgt{
   --tint:255,176,58;
   position:absolute;
-  left:13%;
-  bottom:9%;
-  width:74%;
+  left:10%;
+  bottom:8%;
+  width:80%;
   aspect-ratio:1;
   border-radius:50%;
   cursor:pointer;
@@ -195,8 +195,10 @@ h1 span{display:block;color:var(--phosphor);text-shadow:0 0 26px rgba(255,176,58
 
 @keyframes rise{
   0%{transform:translateY(126%)}
-  16%{transform:translateY(0)}
-  74%{transform:translateY(0)}
+  7%{transform:translateY(86%)}    /* it breaks the surface: this is your warning */
+  17%{transform:translateY(86%)}
+  25%{transform:translateY(0)}
+  86%{transform:translateY(0)}
   100%{transform:translateY(126%)}
 }
 @keyframes burst{
@@ -219,7 +221,7 @@ h1 span{display:block;color:var(--phosphor);text-shadow:0 0 26px rgba(255,176,58
   mix-blend-mode:screen;
   opacity:0;
 }
-.armed:checked ~ .console .sweep{opacity:.55;animation:sweep 5.5s linear infinite}
+.armed:checked ~ .console .sweep{opacity:.34;animation:sweep 6.5s linear infinite}
 @keyframes sweep{to{transform:rotate(360deg)}}
 
 .glass{
@@ -366,6 +368,7 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
   background:linear-gradient(180deg,#0c2c39,#071f2a);
 }
 .k{
+  white-space:nowrap;
   font-family:var(--readout);
   font-size:clamp(9px,1.3vw,11px);
   letter-spacing:.2em;
@@ -382,9 +385,9 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
 }
 .v.score{color:var(--phosphor)}
 .v.score::after{content:counter(score)}
-.v.hits::after{content:counter(contacts) " / " counter(salvage)}
-.v.hit-mine{color:var(--mine)}
-.v.hit-mine::after{content:counter(mines)}
+.v.tally-c::after{content:counter(contacts)}
+.v.tally-s{color:var(--salvage)}
+.v.tally-s::after{content:counter(salvage)}
 
 .clock{display:block;height:1em;overflow:hidden;font-family:var(--readout)}
 .clock span{display:block;height:1em;line-height:1}
@@ -406,7 +409,6 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
 
 /* portrait phone: a taller 3 x 4 board, everything else trimmed to fit */
 @media (max-width:600px){
-  .grid{grid-template-columns:repeat(3,1fr)}
   .readout{grid-template-columns:repeat(2,1fr)}
   .masthead{flex-direction:column;gap:6px}
   .brief{max-width:none}
@@ -422,16 +424,22 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
   .v{font-size:clamp(18px,5vw,24px)}
 }
 
+/* a short, wide window: trim the chrome so the board still fits above the fold */
+@media (min-width:601px) and (max-height:920px){
+  body{padding:18px}
+  h1{font-size:clamp(24px,3.6vh,36px)}
+  .brief{font-size:13px;max-width:30ch}
+  .footnote{display:none}
+  .console{gap:10px}
+}
+
 /* landscape phone: short and wide, so the board goes 6 x 2 */
 @media (orientation:landscape) and (max-height:640px){
   body{padding:10px clamp(12px,3vw,26px)}
-  .rig{width:min(900px,100%)}
-  .console{gap:8px}
-  .masthead{flex-direction:row;align-items:center;gap:12px}
-  h1{font-size:clamp(20px,3.4vh,28px)}
-  h1 span{display:inline;margin-left:.3em}
-  .brief,.footnote{display:none}
-  .grid{grid-template-columns:repeat(6,1fr);gap:6px}
+  .rig{width:min(600px,100%,calc(100vh - 118px))}
+  .console{gap:6px}
+  .masthead,.footnote{display:none}
+  .grid{gap:6px}
   .screen{padding:8px;border-radius:14px}
   .glass{border-radius:14px}
   .cell{padding:5px 10px}
@@ -463,94 +471,68 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
       <div class="sweep"></div>
       <div class="grid">
       <div class="well">
-        <input class="slot" type="checkbox" id="c7" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c7" style="--d:6.69s;--u:1.57s"></label>
-        <input class="slot" type="checkbox" id="c11" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c11" style="--d:10.08s;--u:1.11s"></label>
-        <input class="slot" type="checkbox" id="c28" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c28" style="--d:21.63s;--u:1.27s"></label>
-        <input class="slot" type="checkbox" id="c45" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c45" style="--d:30.45s;--u:1.09s"></label>
+        <input class="slot" type="checkbox" id="c14" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c14" style="--d:15.21s;--u:2.22s"></label>
+        <input class="slot" type="checkbox" id="c26" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c26" style="--d:25.05s;--u:1.97s"></label>
+        <input class="slot" type="checkbox" id="c30" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c30" style="--d:28.04s;--u:1.9s"></label>
+        <input class="slot" type="checkbox" id="c38" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c38" style="--d:33.76s;--u:1.76s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c5" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c5" style="--d:5.24s;--u:1.6s"></label>
-        <input class="slot" type="checkbox" id="c19" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c19" style="--d:15.76s;--u:1.02s"></label>
-        <input class="slot" type="checkbox" id="c22" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c22" style="--d:17.88s;--u:1.34s"></label>
-        <input class="slot" type="checkbox" id="c25" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c25" style="--d:19.87s;--u:1.3s"></label>
-        <input class="slot" type="checkbox" id="c29" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c29" style="--d:22.33s;--u:1.25s"></label>
-        <input class="slot" type="checkbox" id="c36" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c36" style="--d:26.06s;--u:1.18s"></label>
-        <input class="slot" type="checkbox" id="c47" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c47" style="--d:31.24s;--u:1.08s"></label>
-        <input class="slot" type="checkbox" id="c54" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c54" style="--d:33.9s;--u:1.02s"></label>
+        <input class="slot" type="checkbox" id="c3" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c3" style="--d:4.23s;--u:2.0s"></label>
+        <input class="slot" type="checkbox" id="c25" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c25" style="--d:24.24s;--u:1.99s"></label>
+        <input class="slot" type="checkbox" id="c29" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c29" style="--d:27.13s;--u:1.92s"></label>
+        <input class="slot" type="checkbox" id="c33" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c33" style="--d:30.11s;--u:1.85s"></label>
+        <input class="slot" type="checkbox" id="c40" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c40" style="--d:34.83s;--u:1.73s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c12" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c12" style="--d:10.99s;--u:1.48s"></label>
-        <input class="slot" type="checkbox" id="c26" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c26" style="--d:20.51s;--u:1.29s"></label>
-        <input class="slot" type="checkbox" id="c30" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c30" style="--d:22.81s;--u:1.24s"></label>
-        <input class="slot" type="checkbox" id="c37" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c37" style="--d:26.47s;--u:1.17s"></label>
-        <input class="slot" type="checkbox" id="c42" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c42" style="--d:29.06s;--u:1.12s"></label>
-        <input class="slot" type="checkbox" id="c49" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c49" style="--d:32.15s;--u:1.06s"></label>
-        <input class="slot" type="checkbox" id="c59" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c59" style="--d:35.62s;--u:0.73s"></label>
+        <input class="slot" type="checkbox" id="c5" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c5" style="--d:6.61s;--u:2.43s"></label>
+        <input class="slot" type="checkbox" id="c15" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c15" style="--d:15.97s;--u:2.2s"></label>
+        <input class="slot" type="checkbox" id="c19" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c19" style="--d:19.55s;--u:1.69s"></label>
+        <input class="slot" type="checkbox" id="c24" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c24" style="--d:23.51s;--u:2.01s"></label>
+        <input class="slot" type="checkbox" id="c31" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c31" style="--d:28.68s;--u:1.88s"></label>
+        <input class="slot" type="checkbox" id="c34" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c34" style="--d:30.86s;--u:1.83s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c6" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c6" style="--d:6.05s;--u:1.58s"></label>
-        <input class="slot" type="checkbox" id="c40" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c40" style="--d:27.98s;--u:1.14s"></label>
-        <input class="slot" type="checkbox" id="c60" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c60" style="--d:36.06s;--u:0.98s"></label>
+        <input class="slot" type="checkbox" id="c6" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c6" style="--d:7.41s;--u:2.41s"></label>
+        <input class="slot" type="checkbox" id="c10" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c10" style="--d:11.73s;--u:2.31s"></label>
+        <input class="slot" type="checkbox" id="c27" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c27" style="--d:25.66s;--u:1.57s"></label>
+        <input class="slot" type="checkbox" id="c36" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c36" style="--d:32.34s;--u:1.79s"></label>
+        <input class="slot" type="checkbox" id="c45" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c45" style="--d:37.83s;--u:1.65s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c13" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c13" style="--d:11.55s;--u:1.47s"></label>
-        <input class="slot" type="checkbox" id="c18" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c18" style="--d:15.07s;--u:1.4s"></label>
-        <input class="slot" type="checkbox" id="c33" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c33" style="--d:24.49s;--u:1.21s"></label>
-        <input class="slot" type="checkbox" id="c39" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c39" style="--d:27.43s;--u:1.15s"></label>
-        <input class="slot" type="checkbox" id="c50" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c50" style="--d:32.47s;--u:1.05s"></label>
-        <input class="slot" type="checkbox" id="c55" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c55" style="--d:34.23s;--u:1.02s"></label>
-        <input class="slot" type="checkbox" id="c63" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c63" style="--d:37.18s;--u:0.96s"></label>
+        <input class="slot" type="checkbox" id="c4" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c4" style="--d:5.48s;--u:2.46s"></label>
+        <input class="slot" type="checkbox" id="c9" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c9" style="--d:10.49s;--u:2.34s"></label>
+        <input class="slot" type="checkbox" id="c13" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c13" style="--d:14.5s;--u:2.24s"></label>
+        <input class="slot" type="checkbox" id="c18" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c18" style="--d:18.81s;--u:2.13s"></label>
+        <input class="slot" type="checkbox" id="c22" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c22" style="--d:21.81s;--u:2.05s"></label>
+        <input class="slot" type="checkbox" id="c35" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c35" style="--d:31.69s;--u:1.45s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c34" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c34" style="--d:24.98s;--u:1.2s"></label>
-        <input class="slot" type="checkbox" id="c41" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c41" style="--d:28.45s;--u:1.13s"></label>
+        <input class="slot" type="checkbox" id="c12" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c12" style="--d:13.82s;--u:2.25s"></label>
+        <input class="slot" type="checkbox" id="c17" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c17" style="--d:17.75s;--u:2.16s"></label>
+        <input class="slot" type="checkbox" id="c28" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c28" style="--d:26.4s;--u:1.94s"></label>
+        <input class="slot" type="checkbox" id="c37" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c37" style="--d:32.97s;--u:1.78s"></label>
+        <input class="slot" type="checkbox" id="c41" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c41" style="--d:35.48s;--u:1.71s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c20" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c20" style="--d:16.42s;--u:1.37s"></label>
-        <input class="slot" type="checkbox" id="c23" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c23" style="--d:18.6s;--u:1.33s"></label>
-        <input class="slot" type="checkbox" id="c27" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c27" style="--d:21.07s;--u:0.95s"></label>
-        <input class="slot" type="checkbox" id="c51" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c51" style="--d:32.81s;--u:0.77s"></label>
-        <input class="slot" type="checkbox" id="c61" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c61" style="--d:36.45s;--u:0.97s"></label>
+        <input class="slot" type="checkbox" id="c2" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c2" style="--d:3.1s;--u:2.52s"></label>
+        <input class="slot" type="checkbox" id="c7" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c7" style="--d:8.22s;--u:2.39s"></label>
+        <input class="slot" type="checkbox" id="c11" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c11" style="--d:12.79s;--u:1.82s"></label>
+        <input class="slot" type="checkbox" id="c16" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c16" style="--d:16.93s;--u:2.18s"></label>
+        <input class="slot" type="checkbox" id="c42" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c42" style="--d:36.02s;--u:1.7s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c0" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c0" style="--d:0.7s;--u:1.69s"></label>
-        <input class="slot" type="checkbox" id="c44" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c44" style="--d:29.87s;--u:1.1s"></label>
-        <input class="slot" type="checkbox" id="c56" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c56" style="--d:34.51s;--u:1.01s"></label>
-        <input class="slot" type="checkbox" id="c65" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c65" style="--d:37.74s;--u:0.95s"></label>
+        <input class="slot" type="checkbox" id="c0" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c0" style="--d:0.7s;--u:2.58s"></label>
+        <input class="slot" type="checkbox" id="c8" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c8" style="--d:9.41s;--u:2.36s"></label>
+        <input class="slot" type="checkbox" id="c20" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c20" style="--d:20.42s;--u:2.09s"></label>
+        <input class="slot" type="checkbox" id="c23" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c23" style="--d:22.88s;--u:2.03s"></label>
+        <input class="slot" type="checkbox" id="c32" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c32" style="--d:29.41s;--u:1.86s"></label>
+        <input class="slot" type="checkbox" id="c43" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c43" style="--d:36.56s;--u:1.35s"></label>
       </div>
       <div class="well">
-        <input class="slot" type="checkbox" id="c1" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c1" style="--d:1.8s;--u:1.66s"></label>
-        <input class="slot" type="checkbox" id="c8" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c8" style="--d:7.55s;--u:1.55s"></label>
-        <input class="slot" type="checkbox" id="c15" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c15" style="--d:12.98s;--u:1.44s"></label>
-        <input class="slot" type="checkbox" id="c31" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c31" style="--d:23.37s;--u:1.23s"></label>
-        <input class="slot" type="checkbox" id="c35" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c35" style="--d:25.46s;--u:0.88s"></label>
-        <input class="slot" type="checkbox" id="c43" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c43" style="--d:29.51s;--u:0.82s"></label>
-        <input class="slot" type="checkbox" id="c48" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c48" style="--d:31.6s;--u:1.07s"></label>
-        <input class="slot" type="checkbox" id="c52" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c52" style="--d:33.11s;--u:1.04s"></label>
-      </div>
-      <div class="well">
-        <input class="slot" type="checkbox" id="c3" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c3" style="--d:3.39s;--u:1.21s"></label>
-        <input class="slot" type="checkbox" id="c17" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c17" style="--d:14.48s;--u:1.41s"></label>
-        <input class="slot" type="checkbox" id="c21" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c21" style="--d:17.05s;--u:1.36s"></label>
-        <input class="slot" type="checkbox" id="c38" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c38" style="--d:26.84s;--u:1.16s"></label>
-        <input class="slot" type="checkbox" id="c53" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c53" style="--d:33.6s;--u:1.03s"></label>
-      </div>
-      <div class="well">
-        <input class="slot" type="checkbox" id="c2" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c2" style="--d:2.66s;--u:1.65s"></label>
-        <input class="slot" type="checkbox" id="c10" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c10" style="--d:9.45s;--u:1.51s"></label>
-        <input class="slot" type="checkbox" id="c16" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c16" style="--d:13.63s;--u:1.43s"></label>
-        <input class="slot" type="checkbox" id="c24" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c24" style="--d:19.32s;--u:1.31s"></label>
-        <input class="slot" type="checkbox" id="c58" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c58" style="--d:35.17s;--u:1.0s"></label>
-        <input class="slot" type="checkbox" id="c64" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c64" style="--d:37.46s;--u:0.95s"></label>
-      </div>
-      <div class="well">
-        <input class="slot" type="checkbox" id="c4" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c4" style="--d:4.25s;--u:1.62s"></label>
-        <input class="slot" type="checkbox" id="c9" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c9" style="--d:8.56s;--u:1.53s"></label>
-        <input class="slot" type="checkbox" id="c14" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c14" style="--d:12.45s;--u:1.45s"></label>
-        <input class="slot" type="checkbox" id="c32" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c32" style="--d:23.9s;--u:1.22s"></label>
-        <input class="slot" type="checkbox" id="c46" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c46" style="--d:30.84s;--u:1.08s"></label>
-        <input class="slot" type="checkbox" id="c57" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c57" style="--d:34.87s;--u:1.0s"></label>
-        <input class="slot" type="checkbox" id="c62" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c62" style="--d:36.88s;--u:0.96s"></label>
+        <input class="slot" type="checkbox" id="c1" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c1" style="--d:2.04s;--u:2.55s"></label>
+        <input class="slot" type="checkbox" id="c21" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c21" style="--d:21.07s;--u:2.07s"></label>
+        <input class="slot" type="checkbox" id="c39" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c39" style="--d:34.3s;--u:1.74s"></label>
+        <input class="slot" type="checkbox" id="c44" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c44" style="--d:37.09s;--u:1.67s"></label>
       </div>
       </div>
       <div class="glass"></div>
@@ -568,7 +550,7 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
       <div class="report">
         <span class="eyebrow">Sweep complete</span>
         <span class="final"></span>
-        <span class="of">out of 71 on the board</span>
+        <span class="of">out of 51 on the board</span>
         <p class="tally">
           <span>Contacts <b class="c"></b></span>
           <span>Salvage <b class="s"></b></span>
@@ -582,8 +564,8 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
 
     <div class="readout">
       <div class="cell"><span class="k">Score</span><span class="v score"></span></div>
-      <div class="cell"><span class="k">Contacts / salvage</span><span class="v hits"></span></div>
-      <div class="cell"><span class="k">Mines struck</span><span class="v hit-mine"></span></div>
+      <div class="cell"><span class="k">Contacts</span><span class="v tally-c"></span></div>
+      <div class="cell"><span class="k">Salvage</span><span class="v tally-s"></span></div>
       <div class="cell"><span class="k">Time</span><span class="v"><span class="clock"><i>
             <span>40</span>
             <span>39</span>
@@ -629,7 +611,7 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
           </i></span></span></div>
     </div>
 
-    <p class="footnote">66 contacts &middot; no javascript &middot; html and css only</p>
+    <p class="footnote">46 contacts &middot; no javascript &middot; html and css only</p>
   </div>
 </form>
 </body>
