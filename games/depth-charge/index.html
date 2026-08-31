@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="A 40-second sonar reflex game built with HTML and CSS only - no JavaScript.">
 <title>Depth Charge</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +32,12 @@
 body{
   margin:0;
   min-height:100vh;
+  min-height:100svh;
   padding:clamp(14px,3vw,34px);
+  padding-top:max(clamp(14px,3vw,34px), env(safe-area-inset-top));
+  padding-bottom:max(clamp(14px,3vw,34px), env(safe-area-inset-bottom));
+  overscroll-behavior:none;
+  -webkit-tap-highlight-color:transparent;
   display:grid;
   place-items:center;
   background:
@@ -44,7 +49,16 @@ body{
   -webkit-text-size-adjust:100%;
 }
 
-.rig{width:min(820px,100%);margin:0}
+.rig{
+  width:min(820px,100%);
+  margin:0;
+  touch-action:manipulation;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
+/* double-tap zoom has no business firing while someone is drumming on the board */
+.well,.tgt,.plate,button.cta{touch-action:manipulation}
 
 /* the arming switch: hidden, but still reachable from the keyboard */
 .armed{position:absolute;width:1px;height:1px;opacity:0;margin:0;pointer-events:none}
@@ -138,7 +152,8 @@ h1 span{display:block;color:var(--phosphor);text-shadow:0 0 26px rgba(255,176,58
 }
 .tgt.salvage{--tint:79,240,198}
 .tgt.mine{--tint:255,77,109}
-.tgt:hover{filter:brightness(1.18)}
+@media (hover:hover){.tgt:hover{filter:brightness(1.18)}}
+.tgt:active{filter:brightness(1.3)}
 
 .tgt::before{content:"";position:absolute;inset:31%}
 .tgt.contact::before{border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
@@ -389,10 +404,42 @@ button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
   text-align:center;
 }
 
-@media (max-width:560px){
+/* portrait phone: a taller 3 x 4 board, everything else trimmed to fit */
+@media (max-width:600px){
   .grid{grid-template-columns:repeat(3,1fr)}
   .readout{grid-template-columns:repeat(2,1fr)}
-  .masthead{flex-direction:column}
+  .masthead{flex-direction:column;gap:6px}
+  .brief{max-width:none}
+}
+@media (max-width:600px) and (max-height:720px){
+  .brief,.footnote{display:none}
+  body{padding:10px;padding-bottom:max(10px, env(safe-area-inset-bottom))}
+  .console{gap:8px}
+  h1{font-size:clamp(26px,6.4vw,34px)}
+  .screen{padding:8px}
+  .grid{gap:6px}
+  .cell{padding:6px 10px}
+  .v{font-size:clamp(18px,5vw,24px)}
+}
+
+/* landscape phone: short and wide, so the board goes 6 x 2 */
+@media (orientation:landscape) and (max-height:640px){
+  body{padding:10px clamp(12px,3vw,26px)}
+  .rig{width:min(900px,100%)}
+  .console{gap:8px}
+  .masthead{flex-direction:row;align-items:center;gap:12px}
+  h1{font-size:clamp(20px,3.4vh,28px)}
+  h1 span{display:inline;margin-left:.3em}
+  .brief,.footnote{display:none}
+  .grid{grid-template-columns:repeat(6,1fr);gap:6px}
+  .screen{padding:8px;border-radius:14px}
+  .glass{border-radius:14px}
+  .cell{padding:5px 10px}
+  .v{font-size:clamp(16px,3.2vh,22px)}
+  .k{font-size:9px}
+  .cta{font-size:clamp(20px,5vh,32px)}
+  .final{font-size:clamp(38px,11vh,64px)}
+  .plate,.report{gap:8px;padding:10px}
 }
 
 /* ambience is optional; the game itself is not */
