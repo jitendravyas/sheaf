@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A 40-second sonar reflex game built with HTML and CSS only - no JavaScript.">
+<title>Depth Charge</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=Share+Tech+Mono&family=Barlow:wght@400;500&display=swap">
+<style>
+/* Depth Charge - sonar reflex game. HTML + CSS only, not one line of JavaScript.
+   Score is kept with CSS counters, time with keyframes, state with :checked. */
+
+:root{
+  --abyss:#04121a;
+  --deep:#07202b;
+  --hull:#0c2c39;
+  --line:#17505f;
+  --phosphor:#ffb03a;
+  --foam:#dcf0f5;
+  --dim:#7ea6b2;
+  --salvage:#4ff0c6;
+  --mine:#ff4d6d;
+  --round:40s;
+  --display:"Oxanium","Trebuchet MS",sans-serif;
+  --readout:"Share Tech Mono","Courier New",monospace;
+  --body:"Barlow","Helvetica Neue",sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  padding:clamp(14px,3vw,34px);
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(130% 90% at 50% -10%, #0a3040 0%, rgba(10,48,64,0) 62%),
+    radial-gradient(100% 70% at 50% 120%, #0b3444 0%, rgba(11,52,68,0) 60%),
+    var(--abyss);
+  color:var(--foam);
+  font-family:var(--body);
+  -webkit-text-size-adjust:100%;
+}
+
+.rig{width:min(820px,100%);margin:0}
+
+/* the arming switch: hidden, but still reachable from the keyboard */
+.armed{position:absolute;width:1px;height:1px;opacity:0;margin:0;pointer-events:none}
+
+.console{
+  counter-reset:score contacts salvage mines;
+  display:grid;
+  gap:clamp(10px,1.8vw,16px);
+}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 18px}
+h1{
+  margin:0;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(30px,7vw,52px);
+  line-height:.92;
+  letter-spacing:-.02em;
+  text-transform:uppercase;
+  color:var(--foam);
+  text-wrap:balance;
+}
+h1 span{display:block;color:var(--phosphor);text-shadow:0 0 26px rgba(255,176,58,.45)}
+.brief{
+  margin:0;
+  max-width:34ch;
+  font-size:clamp(13px,1.6vw,15px);
+  line-height:1.5;
+  color:var(--dim);
+}
+
+/* ---------- the screen ---------- */
+.screen{
+  position:relative;
+  padding:clamp(9px,1.9vw,16px);
+  border:1px solid var(--line);
+  border-radius:20px;
+  overflow:hidden;
+  background:
+    radial-gradient(120% 100% at 50% -10%, #0b3040, #04141d 70%),
+    var(--deep);
+  box-shadow:inset 0 0 70px rgba(0,0,0,.75), 0 24px 60px rgba(0,0,0,.45);
+}
+.grid{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:clamp(6px,1.4vw,12px);
+}
+
+.well{
+  position:relative;
+  aspect-ratio:1;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid rgba(96,168,186,.28);
+  background:
+    radial-gradient(74% 74% at 50% 42%, rgba(30,100,118,.6), rgba(4,20,28,.92) 76%);
+  box-shadow:inset 0 12px 22px rgba(0,0,0,.6), inset 0 1px 0 rgba(190,235,245,.12);
+}
+/* range ticks etched into every well */
+.well::before{
+  content:"";
+  position:absolute;
+  inset:26%;
+  border:1px solid rgba(126,166,178,.24);
+  border-radius:50%;
+}
+
+/* ---------- contacts ---------- */
+.slot{position:absolute;width:100%;height:100%;margin:0;opacity:0;pointer-events:none;appearance:none}
+
+.tgt{
+  --tint:255,176,58;
+  position:absolute;
+  left:13%;
+  bottom:9%;
+  width:74%;
+  aspect-ratio:1;
+  border-radius:50%;
+  cursor:pointer;
+  color:rgb(var(--tint));
+  transform:translateY(126%);
+  background:radial-gradient(circle at 34% 28%, rgba(255,255,255,.4), rgba(var(--tint),.3) 46%, rgba(var(--tint),.06) 74%);
+  border:2px solid rgba(var(--tint),.92);
+  box-shadow:0 0 18px rgba(var(--tint),.45), inset 0 0 16px rgba(var(--tint),.28);
+  animation:rise var(--u,1.4s) cubic-bezier(.22,.9,.3,1) var(--d,0s) 1 forwards;
+  animation-name:none;
+}
+.tgt.salvage{--tint:79,240,198}
+.tgt.mine{--tint:255,77,109}
+.tgt:hover{filter:brightness(1.18)}
+
+.tgt::before{content:"";position:absolute;inset:31%}
+.tgt.contact::before{border-radius:50%;background:currentColor;box-shadow:0 0 12px currentColor}
+.tgt.salvage::before{
+  inset:19%;
+  background:currentColor;
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
+}
+.tgt.mine::before{
+  inset:25%;
+  background:
+    linear-gradient(45deg,transparent 41%,currentColor 41% 59%,transparent 59%),
+    linear-gradient(-45deg,transparent 41%,currentColor 41% 59%,transparent 59%);
+}
+/* the ping that fires on a hit */
+.tgt::after{
+  content:"";
+  position:absolute;
+  inset:-12%;
+  border:2px solid currentColor;
+  border-radius:50%;
+  opacity:0;
+}
+
+.slot:focus-visible + .tgt{outline:2px solid var(--foam);outline-offset:3px}
+
+/* nothing moves until the rig is armed */
+.armed:checked ~ .console .tgt{animation-name:rise}
+
+/* a struck contact never comes back, and cannot be un-struck */
+.armed:checked ~ .console .slot:checked + .tgt{
+  animation:burst .42s ease-out forwards;
+  pointer-events:none;
+  counter-increment:score 1 contacts 1;
+}
+.armed:checked ~ .console .slot:checked + .tgt.salvage{counter-increment:score 3 salvage 1}
+.armed:checked ~ .console .slot:checked + .tgt.mine{counter-increment:score -2 mines 1}
+.armed:checked ~ .console .slot:checked + .tgt::after{animation:ping .5s ease-out forwards}
+
+@keyframes rise{
+  0%{transform:translateY(126%)}
+  16%{transform:translateY(0)}
+  74%{transform:translateY(0)}
+  100%{transform:translateY(126%)}
+}
+@keyframes burst{
+  0%{transform:translateY(0) scale(1);opacity:1}
+  32%{transform:translateY(-9%) scale(1.28);opacity:1}
+  100%{transform:translateY(0) scale(.15);opacity:0}
+}
+@keyframes ping{
+  0%{transform:scale(.7);opacity:.95}
+  100%{transform:scale(2.4);opacity:0}
+}
+
+/* ---------- sweep + glass ---------- */
+.sweep{
+  position:absolute;
+  z-index:2;
+  inset:-30%;
+  pointer-events:none;
+  background:conic-gradient(from 0deg, rgba(255,176,58,.22), rgba(255,176,58,0) 26%);
+  mix-blend-mode:screen;
+  opacity:0;
+}
+.armed:checked ~ .console .sweep{opacity:.55;animation:sweep 5.5s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+
+.glass{
+  position:absolute;
+  z-index:3;
+  inset:0;
+  pointer-events:none;
+  border-radius:20px;
+  background:
+    repeating-linear-gradient(rgba(0,0,0,.26) 0 1px, rgba(0,0,0,0) 1px 3px),
+    radial-gradient(120% 90% at 50% 50%, rgba(0,0,0,0) 52%, rgba(0,0,0,.6) 100%);
+}
+
+/* ---------- overlays ---------- */
+.plate,.report{
+  position:absolute;
+  z-index:4;
+  inset:0;
+  display:grid;
+  align-content:center;
+  justify-items:center;
+  gap:clamp(10px,2vw,18px);
+  padding:clamp(16px,4vw,34px);
+  text-align:center;
+  background:radial-gradient(90% 80% at 50% 40%, rgba(7,32,43,.93), rgba(4,18,26,.97));
+  backdrop-filter:blur(2px);
+}
+.plate{cursor:pointer;transition:opacity .35s ease, visibility 0s linear .35s}
+/* once the rig is armed the plate lifts and stays out of the way */
+.armed:checked ~ .console .plate{visibility:hidden;opacity:0;transition-delay:0s,.35s}
+.eyebrow{
+  font-family:var(--readout);
+  font-size:clamp(11px,1.5vw,13px);
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.cta{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(26px,6vw,44px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--abyss);
+  background:var(--phosphor);
+  border:0;
+  border-radius:999px;
+  padding:.34em 1.1em;
+  box-shadow:0 0 0 1px rgba(255,176,58,.5), 0 0 44px rgba(255,176,58,.35);
+  animation:beacon 2.4s ease-in-out infinite;
+}
+button.cta{cursor:pointer;font-size:clamp(20px,4vw,30px)}
+.armed:focus-visible ~ .console .plate .cta,
+button.cta:focus-visible{outline:3px solid var(--foam);outline-offset:4px}
+@keyframes beacon{
+  0%,100%{box-shadow:0 0 0 1px rgba(255,176,58,.5), 0 0 34px rgba(255,176,58,.28)}
+  50%{box-shadow:0 0 0 1px rgba(255,176,58,.8), 0 0 60px rgba(255,176,58,.55)}
+}
+
+.key{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px clamp(10px,2.4vw,22px);
+  margin:0;
+  padding:0;
+  list-style:none;
+  font-family:var(--readout);
+  font-size:clamp(11px,1.6vw,14px);
+  color:var(--foam);
+}
+.key li{display:flex;align-items:center;gap:8px}
+.chip{
+  --tint:255,176,58;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid rgb(var(--tint));
+  background:rgba(var(--tint),.3);
+  box-shadow:0 0 12px rgba(var(--tint),.5);
+}
+.chip.salvage{--tint:79,240,198}
+.chip.mine{--tint:255,77,109}
+.key b{color:rgb(var(--tint,255,176,58));font-weight:500}
+
+/* the report card waits out the round, then latches open */
+.report{visibility:hidden;opacity:0}
+.armed:checked ~ .console .report{animation:surface .5s ease-out var(--round) forwards}
+@keyframes surface{
+  0%{visibility:visible;opacity:0;transform:scale(1.04)}
+  100%{visibility:visible;opacity:1;transform:scale(1)}
+}
+.final{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(56px,15vw,104px);
+  line-height:.85;
+  color:var(--phosphor);
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 0 40px rgba(255,176,58,.4);
+}
+.final::after{content:counter(score)}
+.of{font-family:var(--readout);font-size:clamp(11px,1.6vw,13px);letter-spacing:.2em;color:var(--dim);margin-top:-6px}
+.tally{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:4px clamp(14px,3vw,26px);
+  margin:0;
+  font-family:var(--readout);
+  font-size:clamp(12px,1.7vw,14px);
+  color:var(--dim);
+}
+.tally b{font-weight:400;color:var(--foam)}
+.tally .c::after{content:counter(contacts)}
+.tally .s::after{content:counter(salvage)}
+.tally .m::after{content:counter(mines)}
+.tally .danger{color:var(--mine)}
+
+/* ---------- instrument panel ---------- */
+.drain{height:6px;border-radius:99px;background:rgba(23,80,95,.5);overflow:hidden}
+.drain i{
+  display:block;
+  height:100%;
+  transform-origin:left;
+  background:linear-gradient(90deg,var(--phosphor),var(--mine));
+}
+.armed:checked ~ .console .drain i{animation:drain var(--round) linear forwards}
+@keyframes drain{to{transform:scaleX(0)}}
+
+.readout{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--line);
+  overflow:hidden;
+}
+.cell{
+  display:grid;
+  gap:4px;
+  padding:clamp(8px,1.6vw,13px) clamp(9px,1.8vw,15px);
+  background:linear-gradient(180deg,#0c2c39,#071f2a);
+}
+.k{
+  font-family:var(--readout);
+  font-size:clamp(9px,1.3vw,11px);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.v{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(20px,4.4vw,30px);
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  color:var(--foam);
+}
+.v.score{color:var(--phosphor)}
+.v.score::after{content:counter(score)}
+.v.hits::after{content:counter(contacts) " / " counter(salvage)}
+.v.hit-mine{color:var(--mine)}
+.v.hit-mine::after{content:counter(mines)}
+
+.clock{display:block;height:1em;overflow:hidden;font-family:var(--readout)}
+.clock span{display:block;height:1em;line-height:1}
+.armed:checked ~ .console .clock i{animation:countdown var(--round) steps(40,end) forwards}
+.armed:checked ~ .console .clock{animation:heat var(--round) linear forwards}
+.clock i{display:block;font-style:normal}
+@keyframes countdown{to{transform:translateY(-40em)}}
+@keyframes heat{0%,78%{color:var(--foam)}100%{color:var(--mine)}}
+
+.footnote{
+  margin:0;
+  font-family:var(--readout);
+  font-size:clamp(10px,1.4vw,12px);
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:rgba(126,166,178,.7);
+  text-align:center;
+}
+
+@media (max-width:560px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .readout{grid-template-columns:repeat(2,1fr)}
+  .masthead{flex-direction:column}
+}
+
+/* ambience is optional; the game itself is not */
+@media (prefers-reduced-motion:reduce){
+  .armed:checked ~ .console .sweep{animation:none;opacity:.2}
+  .cta{animation:none}
+  .armed:checked ~ .console .report{animation-duration:.01s}
+}
+</style>
+</head>
+<body>
+<form class="rig" autocomplete="off">
+  <input class="armed" type="checkbox" id="armed">
+  <div class="console">
+    <header class="masthead">
+      <h1>Depth<span>Charge</span></h1>
+      <p class="brief">You have 40 seconds on the sonar. Strike every contact that surfaces, grab the salvage, and keep your hands off the mines.</p>
+    </header>
+
+    <div class="screen">
+      <div class="sweep"></div>
+      <div class="grid">
+      <div class="well">
+        <input class="slot" type="checkbox" id="c7" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c7" style="--d:6.69s;--u:1.57s"></label>
+        <input class="slot" type="checkbox" id="c11" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c11" style="--d:10.08s;--u:1.11s"></label>
+        <input class="slot" type="checkbox" id="c28" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c28" style="--d:21.63s;--u:1.27s"></label>
+        <input class="slot" type="checkbox" id="c45" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c45" style="--d:30.45s;--u:1.09s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c5" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c5" style="--d:5.24s;--u:1.6s"></label>
+        <input class="slot" type="checkbox" id="c19" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c19" style="--d:15.76s;--u:1.02s"></label>
+        <input class="slot" type="checkbox" id="c22" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c22" style="--d:17.88s;--u:1.34s"></label>
+        <input class="slot" type="checkbox" id="c25" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c25" style="--d:19.87s;--u:1.3s"></label>
+        <input class="slot" type="checkbox" id="c29" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c29" style="--d:22.33s;--u:1.25s"></label>
+        <input class="slot" type="checkbox" id="c36" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c36" style="--d:26.06s;--u:1.18s"></label>
+        <input class="slot" type="checkbox" id="c47" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c47" style="--d:31.24s;--u:1.08s"></label>
+        <input class="slot" type="checkbox" id="c54" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c54" style="--d:33.9s;--u:1.02s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c12" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c12" style="--d:10.99s;--u:1.48s"></label>
+        <input class="slot" type="checkbox" id="c26" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c26" style="--d:20.51s;--u:1.29s"></label>
+        <input class="slot" type="checkbox" id="c30" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c30" style="--d:22.81s;--u:1.24s"></label>
+        <input class="slot" type="checkbox" id="c37" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c37" style="--d:26.47s;--u:1.17s"></label>
+        <input class="slot" type="checkbox" id="c42" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c42" style="--d:29.06s;--u:1.12s"></label>
+        <input class="slot" type="checkbox" id="c49" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c49" style="--d:32.15s;--u:1.06s"></label>
+        <input class="slot" type="checkbox" id="c59" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c59" style="--d:35.62s;--u:0.73s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c6" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c6" style="--d:6.05s;--u:1.58s"></label>
+        <input class="slot" type="checkbox" id="c40" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c40" style="--d:27.98s;--u:1.14s"></label>
+        <input class="slot" type="checkbox" id="c60" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c60" style="--d:36.06s;--u:0.98s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c13" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c13" style="--d:11.55s;--u:1.47s"></label>
+        <input class="slot" type="checkbox" id="c18" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c18" style="--d:15.07s;--u:1.4s"></label>
+        <input class="slot" type="checkbox" id="c33" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c33" style="--d:24.49s;--u:1.21s"></label>
+        <input class="slot" type="checkbox" id="c39" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c39" style="--d:27.43s;--u:1.15s"></label>
+        <input class="slot" type="checkbox" id="c50" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c50" style="--d:32.47s;--u:1.05s"></label>
+        <input class="slot" type="checkbox" id="c55" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c55" style="--d:34.23s;--u:1.02s"></label>
+        <input class="slot" type="checkbox" id="c63" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c63" style="--d:37.18s;--u:0.96s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c34" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c34" style="--d:24.98s;--u:1.2s"></label>
+        <input class="slot" type="checkbox" id="c41" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c41" style="--d:28.45s;--u:1.13s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c20" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c20" style="--d:16.42s;--u:1.37s"></label>
+        <input class="slot" type="checkbox" id="c23" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c23" style="--d:18.6s;--u:1.33s"></label>
+        <input class="slot" type="checkbox" id="c27" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c27" style="--d:21.07s;--u:0.95s"></label>
+        <input class="slot" type="checkbox" id="c51" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c51" style="--d:32.81s;--u:0.77s"></label>
+        <input class="slot" type="checkbox" id="c61" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c61" style="--d:36.45s;--u:0.97s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c0" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c0" style="--d:0.7s;--u:1.69s"></label>
+        <input class="slot" type="checkbox" id="c44" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c44" style="--d:29.87s;--u:1.1s"></label>
+        <input class="slot" type="checkbox" id="c56" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c56" style="--d:34.51s;--u:1.01s"></label>
+        <input class="slot" type="checkbox" id="c65" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c65" style="--d:37.74s;--u:0.95s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c1" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c1" style="--d:1.8s;--u:1.66s"></label>
+        <input class="slot" type="checkbox" id="c8" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c8" style="--d:7.55s;--u:1.55s"></label>
+        <input class="slot" type="checkbox" id="c15" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c15" style="--d:12.98s;--u:1.44s"></label>
+        <input class="slot" type="checkbox" id="c31" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c31" style="--d:23.37s;--u:1.23s"></label>
+        <input class="slot" type="checkbox" id="c35" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c35" style="--d:25.46s;--u:0.88s"></label>
+        <input class="slot" type="checkbox" id="c43" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c43" style="--d:29.51s;--u:0.82s"></label>
+        <input class="slot" type="checkbox" id="c48" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c48" style="--d:31.6s;--u:1.07s"></label>
+        <input class="slot" type="checkbox" id="c52" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c52" style="--d:33.11s;--u:1.04s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c3" tabindex="-1" aria-hidden="true"><label class="tgt salvage" for="c3" style="--d:3.39s;--u:1.21s"></label>
+        <input class="slot" type="checkbox" id="c17" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c17" style="--d:14.48s;--u:1.41s"></label>
+        <input class="slot" type="checkbox" id="c21" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c21" style="--d:17.05s;--u:1.36s"></label>
+        <input class="slot" type="checkbox" id="c38" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c38" style="--d:26.84s;--u:1.16s"></label>
+        <input class="slot" type="checkbox" id="c53" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c53" style="--d:33.6s;--u:1.03s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c2" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c2" style="--d:2.66s;--u:1.65s"></label>
+        <input class="slot" type="checkbox" id="c10" tabindex="-1" aria-hidden="true"><label class="tgt mine" for="c10" style="--d:9.45s;--u:1.51s"></label>
+        <input class="slot" type="checkbox" id="c16" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c16" style="--d:13.63s;--u:1.43s"></label>
+        <input class="slot" type="checkbox" id="c24" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c24" style="--d:19.32s;--u:1.31s"></label>
+        <input class="slot" type="checkbox" id="c58" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c58" style="--d:35.17s;--u:1.0s"></label>
+        <input class="slot" type="checkbox" id="c64" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c64" style="--d:37.46s;--u:0.95s"></label>
+      </div>
+      <div class="well">
+        <input class="slot" type="checkbox" id="c4" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c4" style="--d:4.25s;--u:1.62s"></label>
+        <input class="slot" type="checkbox" id="c9" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c9" style="--d:8.56s;--u:1.53s"></label>
+        <input class="slot" type="checkbox" id="c14" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c14" style="--d:12.45s;--u:1.45s"></label>
+        <input class="slot" type="checkbox" id="c32" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c32" style="--d:23.9s;--u:1.22s"></label>
+        <input class="slot" type="checkbox" id="c46" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c46" style="--d:30.84s;--u:1.08s"></label>
+        <input class="slot" type="checkbox" id="c57" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c57" style="--d:34.87s;--u:1.0s"></label>
+        <input class="slot" type="checkbox" id="c62" tabindex="-1" aria-hidden="true"><label class="tgt contact" for="c62" style="--d:36.88s;--u:0.96s"></label>
+      </div>
+      </div>
+      <div class="glass"></div>
+
+      <label class="plate" for="armed">
+        <span class="eyebrow">Sonar rig &middot; 40 second sweep</span>
+        <span class="cta">Dive</span>
+        <ul class="key">
+          <li><span class="chip"></span> Contact <b>+1</b></li>
+          <li><span class="chip salvage"></span> Salvage <b>+3</b></li>
+          <li><span class="chip mine"></span> Mine <b>&minus;2</b></li>
+        </ul>
+      </label>
+
+      <div class="report">
+        <span class="eyebrow">Sweep complete</span>
+        <span class="final"></span>
+        <span class="of">out of 71 on the board</span>
+        <p class="tally">
+          <span>Contacts <b class="c"></b></span>
+          <span>Salvage <b class="s"></b></span>
+          <span class="danger">Mines struck <b class="m"></b></span>
+        </p>
+        <button type="reset" class="cta">Run it back</button>
+      </div>
+    </div>
+
+    <div class="drain"><i></i></div>
+
+    <div class="readout">
+      <div class="cell"><span class="k">Score</span><span class="v score"></span></div>
+      <div class="cell"><span class="k">Contacts / salvage</span><span class="v hits"></span></div>
+      <div class="cell"><span class="k">Mines struck</span><span class="v hit-mine"></span></div>
+      <div class="cell"><span class="k">Time</span><span class="v"><span class="clock"><i>
+            <span>40</span>
+            <span>39</span>
+            <span>38</span>
+            <span>37</span>
+            <span>36</span>
+            <span>35</span>
+            <span>34</span>
+            <span>33</span>
+            <span>32</span>
+            <span>31</span>
+            <span>30</span>
+            <span>29</span>
+            <span>28</span>
+            <span>27</span>
+            <span>26</span>
+            <span>25</span>
+            <span>24</span>
+            <span>23</span>
+            <span>22</span>
+            <span>21</span>
+            <span>20</span>
+            <span>19</span>
+            <span>18</span>
+            <span>17</span>
+            <span>16</span>
+            <span>15</span>
+            <span>14</span>
+            <span>13</span>
+            <span>12</span>
+            <span>11</span>
+            <span>10</span>
+            <span>09</span>
+            <span>08</span>
+            <span>07</span>
+            <span>06</span>
+            <span>05</span>
+            <span>04</span>
+            <span>03</span>
+            <span>02</span>
+            <span>01</span>
+            <span>00</span>
+          </i></span></span></div>
+    </div>
+
+    <p class="footnote">66 contacts &middot; no javascript &middot; html and css only</p>
+  </div>
+</form>
+</body>
+</html>
